@@ -14,3 +14,4 @@ Random Side Project Because We Were Bored
 
 The games load their Unity WebGL builds from the CDN URLs in their HTML pages, so an internet connection is required.
 Game pages and cover images are stored in the `Games` folder.
+The catalog also loads the additional game library from its published CDN list, so an internet connection is required to browse those games.

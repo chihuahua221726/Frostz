@@ -33,6 +33,41 @@
         color: #b7b8c2;
       }
 
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .game-search {
+        width: 100%;
+        margin: 0 0 28px;
+        padding: 12px 14px;
+        border: 1px solid #343640;
+        border-radius: 8px;
+        background: #1b1c23;
+        color: #f5f5f7;
+        font: inherit;
+      }
+
+      .game-library {
+        margin-top: 48px;
+      }
+
+      .game-library h2 {
+        margin-bottom: 8px;
+      }
+
+      #library-status {
+        color: #b7b8c2;
+      }
+
       .games {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
@@ -145,6 +180,13 @@
     <main id="catalog">
       <h1>Frostz Games</h1>
       <p class="intro">Pick a game to play.</p>
+      <label class="sr-only" for="game-search">Search games</label>
+      <input
+        class="game-search"
+        id="game-search"
+        type="search"
+        placeholder="Search games..."
+      />
       <section class="games" aria-label="Games">
         <button
           class="game-card"
@@ -259,6 +301,13 @@
           </span>
         </button>
       </section>
+      <section class="game-library" aria-labelledby="library-title">
+        <h2 id="library-title">More Games</h2>
+        <p id="library-status" role="status" aria-live="polite">
+          Loading games...
+        </p>
+        <div class="games" id="remote-games" aria-label="More games"></div>
+      </section>
     </main>
 
     <section id="player" aria-label="Game player" aria-hidden="true">
@@ -274,16 +323,113 @@
       const player = document.getElementById("player");
       const frame = document.getElementById("game-frame");
       const title = document.getElementById("game-title");
+      const search = document.getElementById("game-search");
+      const remoteGames = document.getElementById("remote-games");
+      const libraryStatus = document.getElementById("library-status");
+
+      function openGame(card) {
+        title.textContent = card.dataset.title;
+        frame.src = card.dataset.src;
+        catalog.hidden = true;
+        player.classList.add("active");
+        player.setAttribute("aria-hidden", "false");
+      }
+
+      function filterGames() {
+        const query = search.value.trim().toLocaleLowerCase();
+        document.querySelectorAll(".game-card").forEach((card) => {
+          card.hidden = !card.dataset.title.toLocaleLowerCase().includes(query);
+        });
+      }
 
       document.querySelectorAll(".game-card").forEach((card) => {
         card.addEventListener("click", () => {
-          title.textContent = card.dataset.title;
-          frame.src = card.dataset.src;
-          catalog.hidden = true;
-          player.classList.add("active");
-          player.setAttribute("aria-hidden", "false");
+          openGame(card);
         });
       });
+
+      search.addEventListener("input", filterGames);
+
+      async function loadMoreGames() {
+        const zonesUrl =
+          "https://cdn.jsdelivr.net/gh/freebuisness/assets@main/zones.json";
+        const htmlBase = "https://cdn.jsdelivr.net/gh/freebuisness/html@main";
+        const coverBase = "https://cdn.jsdelivr.net/gh/freebuisness/covers@main";
+
+        try {
+          const response = await fetch(zonesUrl);
+          if (!response.ok) {
+            throw new Error(`Game list request failed (${response.status})`);
+          }
+
+          const zones = await response.json();
+          if (!Array.isArray(zones)) {
+            throw new Error("Game list response was not a list");
+          }
+
+          const games = zones.filter(
+            (zone) =>
+              zone &&
+              typeof zone.name === "string" &&
+              zone.name.trim() &&
+              typeof zone.url === "string" &&
+              zone.url.startsWith("{HTML_URL}/") &&
+              typeof zone.cover === "string" &&
+              zone.cover.startsWith("{COVER_URL}/"),
+          );
+          const fragment = document.createDocumentFragment();
+
+          games.forEach((game) => {
+            const gameUrl = new URL(game.url.replace("{HTML_URL}", htmlBase));
+            const coverUrl = new URL(game.cover.replace("{COVER_URL}", coverBase));
+            if (
+              gameUrl.protocol !== "https:" ||
+              coverUrl.protocol !== "https:" ||
+              gameUrl.hostname !== "cdn.jsdelivr.net" ||
+              coverUrl.hostname !== "cdn.jsdelivr.net"
+            ) {
+              return;
+            }
+
+            const card = document.createElement("button");
+            card.className = "game-card";
+            card.type = "button";
+            card.dataset.title = game.name;
+            card.dataset.src = gameUrl.href;
+            card.addEventListener("click", () => openGame(card));
+
+            const image = document.createElement("img");
+            image.className = "game-photo";
+            image.src = coverUrl.href;
+            image.alt = `${game.name} cover`;
+            image.loading = "lazy";
+            image.decoding = "async";
+
+            const details = document.createElement("span");
+            details.className = "game-details";
+            const gameName = document.createElement("strong");
+            gameName.textContent = game.name;
+            const action = document.createElement("span");
+            action.textContent = "Click to play";
+            details.append(gameName, action);
+            card.append(image, details);
+            fragment.append(card);
+          });
+
+          remoteGames.append(fragment);
+          const loadedCount = remoteGames.childElementCount;
+          libraryStatus.textContent = loadedCount
+            ? `${loadedCount} more games loaded.`
+            : "No additional games are available.";
+          filterGames();
+        } catch (error) {
+          console.error("Could not load more games:", error);
+          libraryStatus.textContent =
+            "More games could not be loaded. Check your internet connection and refresh the page.";
+        }
+      }
+
+      loadMoreGames();
 
       document.getElementById("back-button").addEventListener("click", () => {
         frame.src = "about:blank";
