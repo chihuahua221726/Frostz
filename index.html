@@ -158,6 +158,12 @@
         white-space: nowrap;
       }
 
+      #game-status {
+        margin: 0 0 0 auto;
+        color: #b7b8c2;
+        font-size: 0.9rem;
+      }
+
       #game-frame {
         width: 100%;
         height: 100%;
@@ -314,6 +320,7 @@
       <div class="player-toolbar">
         <button id="back-button" type="button">Back to games</button>
         <strong id="game-title"></strong>
+        <p id="game-status" role="status" aria-live="polite"></p>
       </div>
       <iframe id="game-frame" title="Game" allow="fullscreen"></iframe>
     </section>
@@ -321,18 +328,108 @@
     <script>
       const catalog = document.getElementById("catalog");
       const player = document.getElementById("player");
-      const frame = document.getElementById("game-frame");
+      let frame = document.getElementById("game-frame");
       const title = document.getElementById("game-title");
+      const gameStatus = document.getElementById("game-status");
       const search = document.getElementById("game-search");
       const remoteGames = document.getElementById("remote-games");
       const libraryStatus = document.getElementById("library-status");
+      let activeGameController = null;
 
-      function openGame(card) {
+      async function openGame(card) {
+        if (activeGameController) {
+          activeGameController.abort();
+        }
+        activeGameController = null;
         title.textContent = card.dataset.title;
-        frame.src = card.dataset.src;
         catalog.hidden = true;
         player.classList.add("active");
         player.setAttribute("aria-hidden", "false");
+
+        const freshFrame = document.createElement("iframe");
+        freshFrame.id = "game-frame";
+        freshFrame.title = "Game";
+        freshFrame.allow = "fullscreen; gamepad; autoplay; clipboard-read; clipboard-write";
+        frame.replaceWith(freshFrame);
+        frame = freshFrame;
+
+        if (card.dataset.remote !== "true") {
+          gameStatus.textContent = "";
+          frame.src = card.dataset.src;
+          return;
+        }
+
+        frame.sandbox.add(
+          "allow-scripts",
+          "allow-forms",
+          "allow-pointer-lock",
+          "allow-downloads",
+          "allow-popups",
+          "allow-popups-to-escape-sandbox",
+          "allow-presentation",
+        );
+        gameStatus.textContent = "Loading game...";
+        const controller = new AbortController();
+        activeGameController = controller;
+        const timeout = setTimeout(() => {
+          controller.abort();
+          if (activeGameController === controller) {
+            activeGameController = null;
+            gameStatus.textContent =
+              "The game took too long to load. Check your connection and try again.";
+          }
+        }, 60000);
+
+        try {
+          const response = await fetch(card.dataset.src, {
+            signal: controller.signal,
+          });
+          if (!response.ok) {
+            throw new Error(`Game request failed (${response.status})`);
+          }
+          const gameHtml = await response.text();
+          if (controller.signal.aborted) {
+            return;
+          }
+
+          const gameDocument = new DOMParser().parseFromString(
+            gameHtml,
+            "text/html",
+          );
+          if (!gameDocument.querySelector("base[href]")) {
+            const base = gameDocument.createElement("base");
+            base.href = new URL(".", card.dataset.src).href;
+            gameDocument.head.prepend(base);
+          }
+
+          const gameBlobUrl = URL.createObjectURL(
+            new Blob(
+              [`<!doctype html>\n${gameDocument.documentElement.outerHTML}`],
+              { type: "text/html" },
+            ),
+          );
+          frame.addEventListener(
+            "load",
+            () => {
+              URL.revokeObjectURL(gameBlobUrl);
+              gameStatus.textContent = "";
+            },
+            { once: true },
+          );
+          frame.src = gameBlobUrl;
+        } catch (error) {
+          if (controller.signal.aborted) {
+            return;
+          }
+          console.error(`Could not load ${card.dataset.title}:`, error);
+          gameStatus.textContent =
+            "The game could not be loaded. Check your connection and try again.";
+        } finally {
+          clearTimeout(timeout);
+          if (activeGameController === controller) {
+            activeGameController = null;
+          }
+        }
       }
 
       function filterGames() {
@@ -396,6 +493,7 @@
             card.type = "button";
             card.dataset.title = game.name;
             card.dataset.src = gameUrl.href;
+            card.dataset.remote = "true";
             card.addEventListener("click", () => openGame(card));
 
             const image = document.createElement("img");
@@ -432,7 +530,12 @@
       loadMoreGames();
 
       document.getElementById("back-button").addEventListener("click", () => {
+        if (activeGameController) {
+          activeGameController.abort();
+        }
+        activeGameController = null;
         frame.src = "about:blank";
+        gameStatus.textContent = "";
         player.classList.remove("active");
         player.setAttribute("aria-hidden", "true");
         catalog.hidden = false;
