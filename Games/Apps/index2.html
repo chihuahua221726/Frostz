@@ -1,1 +1,783 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FrostZ</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background: #101116;
+        color: #f5f5f7;
+        font-family: Arial, sans-serif;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .screen[hidden] {
+        display: none;
+      }
+
+      .home-screen {
+        min-height: 100vh;
+        display: flex;
+        background:
+          linear-gradient(rgba(7, 18, 35, 0.28), rgba(7, 18, 35, 0.5)),
+          url("Games/assets/home-background.png") center / cover fixed;
+      }
+
+      .home-sidebar {
+        width: 240px;
+        height: 100vh;
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px 12px;
+        overflow: hidden;
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(16, 17, 22, 0.78);
+        transition: width 180ms ease;
+      }
+
+      .home-screen.sidebar-collapsed .home-sidebar {
+        width: 72px;
+      }
+
+      .home-sidebar-toggle {
+        min-height: 44px;
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        border-radius: 8px;
+        background: rgba(39, 40, 50, 0.9);
+        color: #fff;
+        font: inherit;
+        font-size: 1.25rem;
+        cursor: pointer;
+      }
+
+      .home-content {
+        min-width: 0;
+        flex: 1;
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        gap: 30px;
+        padding: 32px;
+        text-align: center;
+      }
+
+      .home-content h1 {
+        margin: 0;
+        color: #fff;
+        font-size: clamp(4rem, 14vw, 9rem);
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        text-shadow: 0 5px 24px rgba(0, 0, 0, 0.6);
+      }
+
+      .games-launcher {
+        width: 100%;
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 8px 10px;
+        border: 0;
+        border-radius: 12px;
+        background: transparent;
+        color: #fff;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+      }
+
+      .games-launcher img {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+        object-fit: contain;
+        transition: transform 160ms ease;
+      }
+
+      .games-launcher:hover img,
+      .games-launcher:focus-visible img {
+        transform: scale(1.12);
+      }
+
+      .games-launcher span {
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+
+      .sidebar-collapsed .games-launcher {
+        justify-content: center;
+        padding: 8px 0;
+      }
+
+      .sidebar-collapsed .games-launcher span {
+        display: none;
+      }
+
+      .games-screen {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #101116;
+      }
+
+      .games-header {
+        display: flex;
+        min-height: 64px;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 20px;
+        border-bottom: 1px solid #343640;
+        background: #191a20;
+      }
+
+      .games-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .header-button {
+        display: inline-flex;
+        min-width: 42px;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border: 1px solid #555764;
+        border-radius: 7px;
+        background: #272832;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .home-button {
+        width: 44px;
+        height: 44px;
+        padding: 6px;
+        border-color: transparent;
+        background: transparent;
+      }
+
+      .home-button img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .home-button:hover,
+      .home-button:focus-visible {
+        border-color: #555764;
+        background: #272832;
+      }
+
+      .games-layout {
+        min-height: 0;
+        flex: 1;
+        display: grid;
+        grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+        transition: grid-template-columns 180ms ease;
+      }
+
+      .games-layout.sidebar-collapsed {
+        grid-template-columns: 0 minmax(0, 1fr);
+      }
+
+      .games-sidebar {
+        height: 100%;
+        min-width: 0;
+        overflow: auto;
+        border-right: 1px solid #343640;
+        background: #17181e;
+        transition: visibility 180ms ease;
+      }
+
+      .sidebar-collapsed .games-sidebar {
+        visibility: hidden;
+        overflow: hidden;
+      }
+
+      .game-search {
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        margin: 0;
+        padding: 12px 14px;
+        border: 0;
+        border-bottom: 1px solid #343640;
+        border-radius: 0;
+        background: #17181e;
+        color: #f5f5f7;
+        font: inherit;
+      }
+
+      .game-group-title {
+        margin: 18px 14px 8px;
+        color: #b7b8c2;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      #library-status {
+        margin: 8px 14px;
+        color: #b7b8c2;
+        font-size: 0.85rem;
+      }
+
+      .games {
+        display: grid;
+        gap: 4px;
+        padding: 0 8px 12px;
+      }
+
+      .game-card {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        gap: 12px;
+        padding: 8px;
+        overflow: hidden;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: border-color 150ms ease, background 150ms ease;
+      }
+
+      .game-card[hidden] {
+        display: none;
+      }
+
+      .game-card:hover,
+      .game-card:focus-visible {
+        border-color: #9c8cff;
+        background: #252630;
+      }
+
+      .game-photo {
+        display: block;
+        width: 64px;
+        height: 48px;
+        flex: 0 0 64px;
+        border-radius: 5px;
+        background: #272832;
+        object-fit: cover;
+      }
+
+      .game-photo-contain {
+        object-fit: contain;
+      }
+
+      .game-details {
+        min-width: 0;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .game-details span {
+        display: none;
+      }
+
+      .games-content {
+        display: grid;
+        min-width: 0;
+        place-content: center;
+        padding: 32px;
+        text-align: center;
+      }
+
+      .games-content h2 {
+        margin: 0 0 8px;
+        font-size: clamp(1.8rem, 4vw, 3rem);
+      }
+
+      .games-content p {
+        margin: 0;
+        color: #b7b8c2;
+      }
+
+      #player {
+        position: fixed;
+        inset: 0;
+        display: none;
+        background: #000;
+      }
+
+      #player.active {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .player-toolbar {
+        z-index: 1;
+        display: flex;
+        min-height: 52px;
+        align-items: center;
+        gap: 16px;
+        padding: 8px 16px;
+        background: #191a20;
+        color: #fff;
+      }
+
+      .player-toolbar button {
+        padding: 8px 12px;
+        border: 1px solid #555764;
+        border-radius: 6px;
+        background: #272832;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      #game-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      #game-status {
+        margin: 0 0 0 auto;
+        color: #b7b8c2;
+        font-size: 0.9rem;
+      }
+
+      #game-frame {
+        width: 100%;
+        height: 100%;
+        flex: 1;
+        border: 0;
+      }
+
+      @media (max-width: 700px) {
+        .home-sidebar {
+          width: 200px;
+          padding: 12px 8px;
+        }
+
+        .home-screen.sidebar-collapsed .home-sidebar {
+          width: 64px;
+        }
+
+        .home-content {
+          padding: 20px;
+        }
+
+        .games-layout {
+          grid-template-columns: minmax(220px, 75vw) minmax(0, 1fr);
+        }
+
+        .games-layout.sidebar-collapsed {
+          grid-template-columns: 0 minmax(0, 1fr);
+        }
+
+        .games-header {
+          padding: 8px 12px;
+        }
+
+        .games-content {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="home-screen" class="screen home-screen">
+      <aside id="home-sidebar" class="home-sidebar" aria-label="Homepage navigation">
+        <button
+          id="home-sidebar-toggle"
+          class="home-sidebar-toggle"
+          type="button"
+          aria-controls="home-sidebar"
+          aria-expanded="true"
+          aria-label="Collapse homepage sidebar"
+        >
+          ‹
+        </button>
+        <button id="open-games" class="games-launcher" type="button">
+          <img src="Games/assets/games-icon.png" alt="" />
+          <span>Games</span>
+        </button>
+      </aside>
+      <div class="home-content">
+        <h1>FrostZ</h1>
+      </div>
+    </main>
+
+    <section id="catalog" class="screen games-screen" hidden>
+      <header class="games-header">
+        <button
+          id="home-button"
+          class="header-button home-button"
+          type="button"
+          aria-label="Home"
+          title="Home"
+        >
+          <img src="Games/assets/home-icon.png" alt="" />
+        </button>
+        <button
+          id="sidebar-toggle"
+          class="header-button"
+          type="button"
+          aria-controls="games-sidebar"
+          aria-expanded="true"
+        >
+          Hide games
+        </button>
+        <h1>FrostZ Games</h1>
+      </header>
+      <div id="games-layout" class="games-layout">
+        <aside id="games-sidebar" class="games-sidebar" aria-label="Game list">
+          <label class="sr-only" for="game-search">Search games</label>
+          <input
+            class="game-search"
+            id="game-search"
+            type="search"
+            placeholder="Search games..."
+          />
+          <h2 class="game-group-title">FrostZ Games</h2>
+          <div class="games" id="local-games" aria-label="FrostZ games">
+        <button
+          class="game-card"
+          type="button"
+          data-title="Boil Noodles at Night"
+          data-src="Games/Boilnootiles.html"
+        >
+          <img
+            class="game-photo"
+            src="Games/assets/boil-noodles.png"
+            alt="Boil Noodles at Night game title screen"
+          />
+          <span class="game-details">
+            <strong>Boil Noodles at Night</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+        <button
+          class="game-card"
+          type="button"
+          data-title="Birthday Bash"
+          data-src="Games/Birthdaybash.html"
+        >
+          <img
+            class="game-photo"
+            src="Games/assets/birthday-bash.png"
+            alt="Birthday Bash game title screen"
+          />
+          <span class="game-details">
+            <strong>Birthday Bash</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+        <button
+          class="game-card"
+          type="button"
+          data-title="Cheese Rolling"
+          data-src="Games/Cheeserolling.html"
+        >
+          <img
+            class="game-photo game-photo-contain"
+            src="Games/assets/cheese-rolling.png"
+            alt="Cheese Rolling game title screen"
+          />
+          <span class="game-details">
+            <strong>Cheese Rolling</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+        <button
+          class="game-card"
+          type="button"
+          data-title="Beatblock"
+          data-src="Games/Beatblock.html"
+        >
+          <img
+            class="game-photo game-photo-contain"
+            src="Games/assets/beatblock.png"
+            alt="Beatblock game title screen"
+          />
+          <span class="game-details">
+            <strong>Beatblock</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+        <button
+          class="game-card"
+          type="button"
+          data-title="Thirty Dollar Website"
+          data-src="Games/30dollarwebsite.html"
+        >
+          <img
+            class="game-photo"
+            src="Games/assets/thirty-dollar-website.png"
+            alt="Thirty Dollar Website game screen"
+          />
+          <span class="game-details">
+            <strong>Thirty Dollar Website</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+        <button
+          class="game-card"
+          type="button"
+          data-title="Brotato"
+          data-src="Games/Brotato.html"
+        >
+          <img
+            class="game-photo"
+            src="Games/assets/brotato.png"
+            alt="Brotato game title screen"
+          />
+          <span class="game-details">
+            <strong>Brotato</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+        <button
+          class="game-card"
+          type="button"
+          data-title="InkWave"
+          data-src="Games/InkWave.html"
+        >
+          <img
+            class="game-photo"
+            src="Games/assets/inkwave.png"
+            alt="InkWave game title screen"
+          />
+          <span class="game-details">
+            <strong>InkWave</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+          </div>
+          <h2 class="game-group-title">More Games</h2>
+          <p id="library-status" role="status" aria-live="polite">
+            Loading games...
+          </p>
+          <div class="games" id="remote-games" aria-label="More games"></div>
+        </aside>
+        <main class="games-content">
+          <div>
+            <h2>Choose a game</h2>
+            <p>Pick a game from the sidebar to start playing.</p>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <section id="player" aria-label="Game player" aria-hidden="true">
+      <div class="player-toolbar">
+        <button id="back-button" type="button">Back to games</button>
+        <strong id="game-title"></strong>
+        <p id="game-status" role="status" aria-live="polite"></p>
+      </div>
+      <iframe id="game-frame" title="Game" allow="fullscreen"></iframe>
+    </section>
+
+    <script>
+      const catalog = document.getElementById("catalog");
+      const player = document.getElementById("player");
+      let frame = document.getElementById("game-frame");
+      const title = document.getElementById("game-title");
+      const gameStatus = document.getElementById("game-status");
+      const search = document.getElementById("game-search");
+      const remoteGames = document.getElementById("remote-games");
+      const libraryStatus = document.getElementById("library-status");
+      const homeScreen = document.getElementById("home-screen");
+      const gamesLayout = document.getElementById("games-layout");
+      const sidebarToggle = document.getElementById("sidebar-toggle");
+      const homeSidebarToggle = document.getElementById("home-sidebar-toggle");
+
+      document.getElementById("open-games").addEventListener("click", () => {
+        homeScreen.hidden = true;
+        catalog.hidden = false;
+      });
+
+      homeSidebarToggle.addEventListener("click", () => {
+        const collapsed = homeScreen.classList.toggle("sidebar-collapsed");
+        homeSidebarToggle.textContent = collapsed ? "›" : "‹";
+        homeSidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+        homeSidebarToggle.setAttribute(
+          "aria-label",
+          collapsed ? "Expand homepage sidebar" : "Collapse homepage sidebar",
+        );
+      });
+
+      function goHome() {
+        frame.src = "about:blank";
+        player.classList.remove("active");
+        player.setAttribute("aria-hidden", "true");
+        catalog.hidden = true;
+        homeScreen.hidden = false;
+      }
+
+      document.getElementById("home-button").addEventListener("click", goHome);
+
+      sidebarToggle.addEventListener("click", () => {
+        const collapsed = gamesLayout.classList.toggle("sidebar-collapsed");
+        sidebarToggle.textContent = collapsed ? "Show games" : "Hide games";
+        sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+      });
+
+      function openGame(card) {
+        title.textContent = card.dataset.title;
+        catalog.hidden = true;
+        player.classList.add("active");
+        player.setAttribute("aria-hidden", "false");
+
+        const freshFrame = document.createElement("iframe");
+        freshFrame.id = "game-frame";
+        freshFrame.title = "Game";
+        freshFrame.allow = "fullscreen; gamepad; autoplay; clipboard-read; clipboard-write";
+        frame.replaceWith(freshFrame);
+        frame = freshFrame;
+
+        gameStatus.textContent =
+          card.dataset.remote === "true" ? "Loading game..." : "";
+        frame.addEventListener(
+          "load",
+          () => {
+            gameStatus.textContent = "";
+          },
+          { once: true },
+        );
+        frame.src = card.dataset.src;
+      }
+
+      function filterGames() {
+        const query = search.value.trim().toLocaleLowerCase();
+        document.querySelectorAll(".game-card").forEach((card) => {
+          card.hidden = !card.dataset.title.toLocaleLowerCase().includes(query);
+        });
+      }
+
+      document.querySelectorAll(".game-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          openGame(card);
+        });
+      });
+
+      search.addEventListener("input", filterGames);
+
+      async function loadMoreGames() {
+        const zonesUrl =
+          "https://cdn.jsdelivr.net/gh/freebuisness/assets@main/zones.json";
+        const htmlBase = "https://raw.githack.com/freebuisness/html/main";
+        const coverBase = "https://cdn.jsdelivr.net/gh/freebuisness/covers@main";
+
+        try {
+          const response = await fetch(zonesUrl);
+          if (!response.ok) {
+            throw new Error(`Game list request failed (${response.status})`);
+          }
+
+          const zones = await response.json();
+          if (!Array.isArray(zones)) {
+            throw new Error("Game list response was not a list");
+          }
+
+          const games = zones.filter(
+            (zone) =>
+              zone &&
+              typeof zone.name === "string" &&
+              zone.name.trim() &&
+              typeof zone.url === "string" &&
+              zone.url.startsWith("{HTML_URL}/") &&
+              typeof zone.cover === "string" &&
+              zone.cover.startsWith("{COVER_URL}/"),
+          );
+          const fragment = document.createDocumentFragment();
+
+          games.forEach((game) => {
+            const gameUrl = new URL(game.url.replace("{HTML_URL}", htmlBase));
+            const coverUrl = new URL(game.cover.replace("{COVER_URL}", coverBase));
+            if (
+              gameUrl.protocol !== "https:" ||
+              coverUrl.protocol !== "https:" ||
+              gameUrl.hostname !== "raw.githack.com" ||
+              coverUrl.hostname !== "cdn.jsdelivr.net"
+            ) {
+              return;
+            }
+
+            const card = document.createElement("button");
+            card.className = "game-card";
+            card.type = "button";
+            card.dataset.title = game.name;
+            card.dataset.src = gameUrl.href;
+            card.dataset.remote = "true";
+            card.addEventListener("click", () => openGame(card));
+
+            const image = document.createElement("img");
+            image.className = "game-photo";
+            image.src = coverUrl.href;
+            image.alt = `${game.name} cover`;
+            image.loading = "lazy";
+            image.decoding = "async";
+
+            const details = document.createElement("span");
+            details.className = "game-details";
+            const gameName = document.createElement("strong");
+            gameName.textContent = game.name;
+            const action = document.createElement("span");
+            action.textContent = "Click to play";
+            details.append(gameName, action);
+            card.append(image, details);
+            fragment.append(card);
+          });
+
+          remoteGames.append(fragment);
+          const loadedCount = remoteGames.childElementCount;
+          libraryStatus.textContent = loadedCount
+            ? `${loadedCount} more games loaded.`
+            : "No additional games are available.";
+          filterGames();
+        } catch (error) {
+          console.error("Could not load more games:", error);
+          libraryStatus.textContent =
+            "More games could not be loaded. Check your internet connection and refresh the page.";
+        }
+      }
+
+      loadMoreGames();
+
+      document.getElementById("back-button").addEventListener("click", () => {
+        frame.src = "about:blank";
+        gameStatus.textContent = "";
+        player.classList.remove("active");
+        player.setAttribute("aria-hidden", "true");
+        catalog.hidden = false;
+      });
+    </script>
+  </body>
+</html>
 
