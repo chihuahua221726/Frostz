@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FrostZ</title>
+    <link rel="stylesheet" href="Effects/frostz-title.css?v=3" />
     <style>
       * {
         box-sizing: border-box;
@@ -12,8 +13,8 @@
       body {
         min-height: 100vh;
         margin: 0;
-        background: #101116;
-        color: #f5f5f7;
+        background: #081724;
+        color: #eaf8ff;
         font-family: Arial, sans-serif;
       }
 
@@ -29,6 +30,227 @@
         border: 0;
       }
 
+      .creator-gate[hidden] {
+        display: none;
+      }
+
+      .creator-gate {
+        position: fixed;
+        z-index: 100;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        overflow-y: auto;
+        padding: 24px;
+        background:
+          radial-gradient(ellipse at 50% 35%, rgba(84, 191, 231, 0.19), transparent 44%),
+          linear-gradient(rgba(3, 17, 29, 0.78), rgba(3, 18, 31, 0.9)),
+          url("Games/assets/home-background.png") center / cover;
+        backdrop-filter: blur(12px);
+      }
+
+      .creator-card {
+        position: relative;
+        width: min(520px, 100%);
+        overflow: hidden;
+        border: 1px solid rgba(176, 236, 255, 0.58);
+        border-radius: 20px;
+        background:
+          radial-gradient(ellipse at 0 0, rgba(125, 221, 255, 0.12), transparent 50%),
+          linear-gradient(155deg, rgba(14, 48, 69, 0.99), rgba(5, 23, 39, 0.99) 72%);
+        box-shadow: 0 28px 90px rgba(0, 9, 20, 0.58), 0 0 42px rgba(83, 200, 242, 0.14), inset 0 1px rgba(255, 255, 255, 0.17);
+        color: #eaf8ff;
+        animation: creator-card-arrive 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+
+      .creator-card::before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(201, 246, 255, 0.8), transparent);
+        content: "";
+        pointer-events: none;
+      }
+
+      .creator-header {
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 18px;
+        border-bottom: 1px solid rgba(173, 235, 255, 0.2);
+        background: rgba(159, 225, 248, 0.05);
+      }
+
+      .creator-header h1 {
+        margin: 0;
+        color: #f2fbff;
+        font-size: 1.18rem;
+        font-weight: 750;
+        letter-spacing: 0.01em;
+      }
+
+      .creator-close {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        flex: 0 0 34px;
+        place-items: center;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        background: transparent;
+        color: #c9e8f4;
+        font: inherit;
+        font-size: 1.3rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .creator-close:hover,
+      .creator-close:focus-visible {
+        border-color: rgba(173, 235, 255, 0.36);
+        background: rgba(146, 226, 255, 0.12);
+        color: #fff;
+        outline: none;
+      }
+
+      .creator-body {
+        display: grid;
+        gap: 17px;
+        padding: 20px;
+      }
+
+      .creator-intro {
+        margin: 0;
+        color: #c1d9e5;
+        font-size: 0.94rem;
+        line-height: 1.55;
+      }
+
+      .creator-kicker {
+        margin: 0;
+        color: #e5f7ff;
+        font-size: 0.93rem;
+        font-weight: 750;
+      }
+
+      .creator-profile {
+        min-height: 78px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 14px;
+        border: 1px solid rgba(173, 235, 255, 0.3);
+        border-radius: 14px;
+        background: linear-gradient(110deg, rgba(133, 216, 248, 0.12), rgba(12, 43, 62, 0.44));
+        box-shadow: inset 0 1px rgba(255, 255, 255, 0.07);
+      }
+
+      .creator-avatar {
+        position: relative;
+        width: 54px;
+        height: 54px;
+        display: block;
+        flex: 0 0 54px;
+        border: 2px solid rgba(205, 246, 255, 0.86);
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
+        box-shadow: 0 0 0 3px rgba(139, 221, 250, 0.1), 0 0 18px rgba(103, 220, 255, 0.28), inset 0 2px 8px rgba(255, 255, 255, 0.44);
+      }
+
+      .creator-profile-info {
+        display: grid;
+        gap: 3px;
+        text-align: left;
+      }
+
+      .creator-name {
+        margin: 0;
+        color: #f2fbff;
+        font-size: 0.98rem;
+        font-weight: 750;
+      }
+
+      .creator-discord {
+        color: #a9cad9;
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.015em;
+      }
+
+      .creator-footer {
+        min-height: 66px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 18px;
+        border-top: 1px solid rgba(173, 235, 255, 0.2);
+        background: rgba(159, 225, 248, 0.045);
+      }
+
+      .creator-footer-note {
+        margin: 0;
+        color: #b6d2df;
+        font-size: 0.82rem;
+        line-height: 1.4;
+      }
+
+      .creator-enter {
+        min-width: 82px;
+        min-height: 42px;
+        padding: 8px 17px;
+        border: 1px solid rgba(216, 249, 255, 0.78);
+        border-radius: 10px;
+        background: linear-gradient(135deg, #d5f8ff, #8de0f7 55%, #5cb8e0);
+        box-shadow: 0 8px 26px rgba(62, 177, 220, 0.24), inset 0 1px rgba(255, 255, 255, 0.72);
+        color: #082a40;
+        font: inherit;
+        font-size: 0.9rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .creator-enter:hover,
+      .creator-enter:focus-visible {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 32px rgba(91, 207, 245, 0.46), inset 0 1px rgba(255, 255, 255, 0.8);
+        outline: 2px solid #e4fbff;
+        outline-offset: 3px;
+      }
+
+      @keyframes creator-card-arrive {
+        from {
+          transform: translateY(8px) scale(0.99);
+          opacity: 0;
+        }
+
+        to {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .creator-gate {
+          padding: 16px;
+        }
+
+        .creator-body {
+          padding: 17px;
+        }
+
+        .creator-footer {
+          align-items: flex-start;
+          padding: 12px 16px;
+        }
+      }
+
       .screen[hidden] {
         display: none;
       }
@@ -36,38 +258,155 @@
       .home-screen {
         min-height: 100vh;
         display: flex;
+        overflow: hidden;
         background:
-          linear-gradient(rgba(7, 18, 35, 0.28), rgba(7, 18, 35, 0.5)),
+          linear-gradient(rgba(4, 23, 39, 0.24), rgba(5, 28, 47, 0.56)),
           url("Games/assets/home-background.png") center / cover fixed;
       }
 
       .home-sidebar {
-        width: 240px;
-        height: 100vh;
-        flex: 0 0 auto;
+        position: fixed;
+        z-index: 20;
+        inset: 0 auto 0 0;
+        width: 64px;
+        height: 100dvh;
         display: flex;
         flex-direction: column;
-        gap: 16px;
-        padding: 16px 12px;
-        overflow: hidden;
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(16, 17, 22, 0.78);
-        transition: width 180ms ease;
+        gap: 10px;
+        padding: 18px 12px;
+        overflow: visible;
+        border-right: 1px solid rgba(173, 235, 255, 0.38);
+        background:
+          radial-gradient(ellipse at 0 0, rgba(114, 220, 255, 0.16), transparent 52%),
+          linear-gradient(180deg, rgba(7, 31, 49, 0.97), rgba(4, 18, 32, 0.96));
+        box-shadow: 12px 0 44px rgba(0, 12, 24, 0.38), inset -1px 0 rgba(230, 250, 255, 0.1);
+        backdrop-filter: blur(18px);
+        transform: translateX(-101%);
+        transition: transform 220ms ease, width 220ms ease, padding 220ms ease;
       }
 
-      .home-screen.sidebar-collapsed .home-sidebar {
-        width: 72px;
+      .home-screen.sidebar-open .home-sidebar {
+        transform: translateX(0);
       }
 
-      .home-sidebar-toggle {
-        min-height: 44px;
-        border: 1px solid rgba(255, 255, 255, 0.32);
-        border-radius: 8px;
-        background: rgba(39, 40, 50, 0.9);
-        color: #fff;
+      .home-sidebar-open-button {
+        position: fixed;
+        z-index: 21;
+        top: 18px;
+        left: 14px;
+        display: grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        border: 1px solid rgba(173, 235, 255, 0.55);
+        border-radius: 12px;
+        background: rgba(8, 39, 61, 0.28);
+        box-shadow: 0 4px 20px rgba(0, 12, 24, 0.12);
+        color: rgba(234, 248, 255, 0.78);
         font: inherit;
-        font-size: 1.25rem;
+        font-size: 1.35rem;
         cursor: pointer;
+        backdrop-filter: blur(12px);
+        transition: left 220ms ease, background 160ms ease, box-shadow 160ms ease;
+      }
+
+      .home-sidebar-open-button:hover,
+      .home-sidebar-open-button:focus-visible {
+        background: rgba(44, 119, 153, 0.62);
+        box-shadow: 0 0 22px rgba(83, 200, 242, 0.32);
+        outline: none;
+      }
+
+      .home-screen.sidebar-open .home-sidebar-open-button {
+        left: 76px;
+      }
+
+      .home-sidebar::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(180deg, transparent, rgba(177, 241, 255, 0.72), transparent);
+        content: "";
+        pointer-events: none;
+      }
+
+      .home-sidebar-nav {
+        display: grid;
+        gap: 6px;
+      }
+
+      .settings-launcher {
+        margin-top: auto;
+        position: relative;
+        padding-top: 12px;
+      }
+
+      .settings-launcher::after {
+        position: absolute;
+        top: 0;
+        right: 2px;
+        left: 2px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(157, 221, 246, 0.34), transparent);
+        content: "";
+      }
+
+      .settings-launcher img {
+        filter: drop-shadow(0 0 6px rgba(62, 201, 202, 0.18));
+      }
+
+      .settings-launcher:hover img,
+      .settings-launcher:focus-visible img {
+        filter: drop-shadow(0 0 10px rgba(132, 255, 248, 0.62));
+      }
+
+      .settings-dialog {
+        width: min(440px, calc(100vw - 32px));
+        padding: 26px;
+        border: 1px solid rgba(173, 235, 255, 0.56);
+        border-radius: 20px;
+        background:
+          radial-gradient(ellipse at 0 0, rgba(91, 207, 246, 0.2), transparent 58%),
+          linear-gradient(180deg, #12334a, #081d2d);
+        box-shadow: 0 24px 80px rgba(0, 10, 22, 0.55), inset 0 1px rgba(255, 255, 255, 0.12);
+        color: #eaf8ff;
+      }
+
+      .settings-dialog::backdrop {
+        background: rgba(1, 12, 22, 0.7);
+        backdrop-filter: blur(5px);
+      }
+
+      .settings-dialog h2 {
+        margin: 0 0 10px;
+        color: #eafaff;
+      }
+
+      .settings-dialog p {
+        margin: 0 0 22px;
+        color: #a9c9d9;
+        line-height: 1.5;
+      }
+
+      .settings-dialog-close {
+        min-height: 40px;
+        padding: 8px 16px;
+        border: 1px solid #66c9ef;
+        border-radius: 9px;
+        background: #153f58;
+        color: #eaf8ff;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .settings-dialog-close:hover,
+      .settings-dialog-close:focus-visible {
+        background: #1d5b79;
+        outline: 2px solid #bceeff;
+        outline-offset: 2px;
       }
 
       .home-content {
@@ -76,63 +415,347 @@
         display: grid;
         justify-items: center;
         align-content: center;
-        gap: 30px;
+        gap: 22px;
         padding: 32px;
+        overflow-y: auto;
         text-align: center;
       }
 
       .home-content h1 {
         margin: 0;
-        color: #fff;
+        color: #f3fbff;
         font-size: clamp(4rem, 14vw, 9rem);
         font-weight: 900;
         letter-spacing: 0.04em;
         line-height: 1;
-        text-shadow: 0 5px 24px rgba(0, 0, 0, 0.6);
+        text-shadow: 0 0 18px rgba(112, 220, 255, 0.42), 0 5px 24px rgba(0, 12, 24, 0.65);
+      }
+
+      .brand-lockup {
+        display: grid;
+        justify-items: center;
+        gap: 5px;
+      }
+
+      .brand-tagline {
+        min-height: 1.3em;
+        margin: 0;
+        color: #fff;
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        opacity: 0.92;
+        text-shadow: 0 2px 10px rgba(0, 12, 24, 0.72);
+        transition: opacity 350ms ease, transform 350ms ease, filter 350ms ease;
+      }
+
+      .brand-tagline.is-changing {
+        opacity: 0;
+        transform: translateY(4px);
+        filter: blur(3px);
+      }
+
+      .home-dashboard {
+        width: min(740px, 100%);
+        display: grid;
+        justify-items: center;
+        gap: 22px;
+      }
+
+      .home-search {
+        width: 100%;
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 5px 6px 5px 18px;
+        border: 1px solid rgba(173, 235, 255, 0.3);
+        border-radius: 18px;
+        background: linear-gradient(110deg, rgba(10, 34, 52, 0.9), rgba(15, 49, 69, 0.82));
+        box-shadow: 0 12px 40px rgba(0, 12, 24, 0.34), inset 0 1px rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(14px);
+      }
+
+      .home-search svg {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 20px;
+        color: #aeeeff;
+      }
+
+      .home-search input {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #effbff;
+        font: inherit;
+        text-align: left;
+      }
+
+      .home-search input::placeholder {
+        color: #aac3d0;
+      }
+
+      .home-search:focus-within {
+        border-color: rgba(136, 226, 255, 0.78);
+        box-shadow: 0 0 0 3px rgba(83, 200, 242, 0.12), 0 12px 40px rgba(0, 12, 24, 0.34);
+      }
+
+      .home-search button {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        flex: 0 0 42px;
+        place-items: center;
+        border: 1px solid rgba(198, 246, 255, 0.42);
+        border-radius: 13px;
+        background: linear-gradient(145deg, #c8f6ff, #69c9eb 60%, #42a5d0);
+        box-shadow: 0 0 18px rgba(86, 207, 245, 0.28);
+        color: #06243a;
+        cursor: pointer;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      .home-search button:hover,
+      .home-search button:focus-visible {
+        transform: translateX(2px);
+        box-shadow: 0 0 24px rgba(119, 226, 255, 0.55);
+        outline: 2px solid #d6f8ff;
+        outline-offset: 2px;
+      }
+
+      .home-search button svg {
+        width: 21px;
+        height: 21px;
+        color: inherit;
+      }
+
+      .home-shortcuts {
+        width: min(620px, 100%);
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: clamp(8px, 2.5vw, 22px);
+      }
+
+      .home-shortcut {
+        min-width: 0;
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #eaf8ff;
+        font: inherit;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .shortcut-icon {
+        width: 62px;
+        height: 62px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(173, 235, 255, 0.28);
+        border-radius: 19px;
+        background: linear-gradient(145deg, rgba(20, 61, 83, 0.82), rgba(8, 29, 47, 0.88));
+        box-shadow: inset 0 1px rgba(255, 255, 255, 0.11), 0 8px 22px rgba(0, 12, 24, 0.2);
+        color: #c9f5ff;
+        transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      }
+
+      .shortcut-icon svg {
+        width: 28px;
+        height: 28px;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.8;
+      }
+
+      .home-shortcut:hover .shortcut-icon,
+      .home-shortcut:focus-visible .shortcut-icon {
+        transform: translateY(-3px);
+        border-color: rgba(180, 243, 255, 0.75);
+        background: linear-gradient(145deg, rgba(46, 118, 148, 0.9), rgba(12, 51, 74, 0.94));
+        box-shadow: inset 0 1px rgba(255, 255, 255, 0.18), 0 0 22px rgba(80, 207, 245, 0.27);
+      }
+
+      .home-shortcut:focus-visible {
+        outline: none;
+      }
+
+      .home-shortcut-label {
+        max-width: 100%;
+        overflow: hidden;
+        color: #eaf8ff;
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .home-shortcut:disabled {
+        cursor: not-allowed;
+        opacity: 0.58;
+      }
+
+      .home-shortcut:disabled:hover .shortcut-icon {
+        transform: none;
+        border-color: rgba(173, 235, 255, 0.28);
+        background: linear-gradient(145deg, rgba(20, 61, 83, 0.82), rgba(8, 29, 47, 0.88));
+        box-shadow: inset 0 1px rgba(255, 255, 255, 0.11), 0 8px 22px rgba(0, 12, 24, 0.2);
+      }
+
+      .home-clock {
+        min-width: min(240px, 100%);
+        display: grid;
+        gap: 4px;
+        margin-top: 2px;
+        padding: 18px 26px;
+        border: 1px solid rgba(173, 235, 255, 0.22);
+        border-radius: 18px;
+        background: linear-gradient(150deg, rgba(11, 38, 57, 0.8), rgba(7, 26, 43, 0.78));
+        box-shadow: inset 0 1px rgba(255, 255, 255, 0.07), 0 12px 30px rgba(0, 12, 24, 0.2);
+      }
+
+      .home-clock time:first-child {
+        color: #f0fbff;
+        font-size: clamp(2rem, 6vw, 2.65rem);
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        line-height: 1.1;
+      }
+
+      .home-clock time:last-child {
+        color: #a9c9d9;
+        font-size: 0.9rem;
       }
 
       .games-launcher {
-        width: 100%;
-        min-height: 72px;
+        position: relative;
+        width: 44px;
+        min-height: 44px;
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 8px 10px;
-        border: 0;
+        justify-content: center;
+        gap: 0;
+        margin: 0 auto;
+        padding: 3px;
+        border: 1px solid transparent;
         border-radius: 12px;
         background: transparent;
-        color: #fff;
+        color: #eaf8ff;
         font: inherit;
         text-align: left;
         cursor: pointer;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+        text-shadow: 0 2px 8px rgba(0, 12, 24, 0.8);
+        transition: border-color 170ms ease, background 170ms ease, box-shadow 170ms ease;
+      }
+
+      .games-launcher::before {
+        position: absolute;
+        inset: 3px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, rgba(153, 232, 255, 0.25), rgba(45, 136, 177, 0.22));
+        box-shadow: 0 0 20px rgba(77, 195, 245, 0.2), inset 0 1px rgba(255, 255, 255, 0.15);
+        content: "";
+        opacity: 0;
+        transition: opacity 170ms ease;
+        pointer-events: none;
+      }
+
+      .games-launcher:hover,
+      .games-launcher:focus-visible {
+        border-color: rgba(146, 226, 255, 0.42);
+        outline: none;
+      }
+
+      .games-launcher:hover::before,
+      .games-launcher:focus-visible::before {
+        opacity: 1;
       }
 
       .games-launcher img {
-        width: 48px;
-        height: 48px;
-        flex: 0 0 48px;
+        position: relative;
+        z-index: 1;
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
         object-fit: contain;
-        transition: transform 160ms ease;
+        transition: transform 170ms ease, filter 170ms ease;
       }
 
       .games-launcher:hover img,
       .games-launcher:focus-visible img {
-        transform: scale(1.12);
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 7px rgba(145, 231, 255, 0.72));
       }
 
       .games-launcher span {
-        font-size: 1.1rem;
+        font-size: 0.98rem;
         font-weight: 700;
       }
 
-      .sidebar-collapsed .games-launcher {
-        justify-content: center;
-        padding: 8px 0;
+      .games-launcher .launcher-label {
+        position: absolute;
+        z-index: 2;
+        top: 50%;
+        left: calc(100% + 10px);
+        width: max-content;
+        max-width: min(240px, calc(100vw - 100px));
+        transform: translate(-5px, -50%);
+        padding: 8px 11px;
+        border: 1px solid rgba(173, 235, 255, 0.45);
+        border-radius: 9px;
+        background: linear-gradient(135deg, rgba(22, 65, 89, 0.98), rgba(8, 31, 49, 0.98));
+        box-shadow: 0 8px 24px rgba(0, 12, 24, 0.38), 0 0 16px rgba(77, 195, 245, 0.12);
+        color: #eafaff;
+        font-size: 0.88rem;
+        font-weight: 700;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 140ms ease, transform 140ms ease, visibility 140ms ease;
       }
 
-      .sidebar-collapsed .games-launcher span {
-        display: none;
+      .games-launcher:hover .launcher-label,
+      .games-launcher:focus-visible .launcher-label {
+        transform: translate(0, -50%);
+        opacity: 1;
+        visibility: visible;
+      }
+
+      a.games-launcher {
+        text-decoration: none;
+      }
+
+      .games-launcher .launcher-icon {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+        place-items: center;
+      }
+
+      .launcher-icon-svg {
+        display: block;
+        width: 28px;
+        height: 28px;
+        overflow: visible;
+        filter: drop-shadow(0 0 5px rgba(104, 221, 255, 0.3));
+        transition: filter 170ms ease, transform 170ms ease;
+      }
+
+      .games-launcher:hover .launcher-icon-svg,
+      .games-launcher:focus-visible .launcher-icon-svg {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 9px rgba(166, 240, 255, 0.82));
       }
 
       .games-screen {
@@ -140,7 +763,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        background: #101116;
+        background: #081724;
       }
 
       .games-header {
@@ -149,8 +772,8 @@
         align-items: center;
         gap: 14px;
         padding: 10px 20px;
-        border-bottom: 1px solid #343640;
-        background: #191a20;
+        border-bottom: 1px solid #28516a;
+        background: #102b3e;
       }
 
       .games-header h1 {
@@ -165,9 +788,9 @@
         align-items: center;
         justify-content: center;
         padding: 8px 12px;
-        border: 1px solid #555764;
+        border: 1px solid #3c7898;
         border-radius: 7px;
-        background: #272832;
+        background: #15364b;
         color: inherit;
         font: inherit;
         cursor: pointer;
@@ -190,8 +813,8 @@
 
       .home-button:hover,
       .home-button:focus-visible {
-        border-color: #555764;
-        background: #272832;
+        border-color: #83dfff;
+        background: #1a4964;
       }
 
       .games-layout {
@@ -210,8 +833,8 @@
         height: 100%;
         min-width: 0;
         overflow: auto;
-        border-right: 1px solid #343640;
-        background: #17181e;
+        border-right: 1px solid #28516a;
+        background: #0c2232;
         transition: visibility 180ms ease;
       }
 
@@ -228,16 +851,16 @@
         margin: 0;
         padding: 12px 14px;
         border: 0;
-        border-bottom: 1px solid #343640;
+        border-bottom: 1px solid #28516a;
         border-radius: 0;
-        background: #17181e;
-        color: #f5f5f7;
+        background: #0c2232;
+        color: #eaf8ff;
         font: inherit;
       }
 
       .game-group-title {
         margin: 18px 14px 8px;
-        color: #b7b8c2;
+        color: #a9c9d9;
         font-size: 0.8rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -245,7 +868,7 @@
 
       #library-status {
         margin: 8px 14px;
-        color: #b7b8c2;
+        color: #a9c9d9;
         font-size: 0.85rem;
       }
 
@@ -278,8 +901,8 @@
 
       .game-card:hover,
       .game-card:focus-visible {
-        border-color: #9c8cff;
-        background: #252630;
+        border-color: #83dfff;
+        background: #15394f;
       }
 
       .game-photo {
@@ -288,7 +911,7 @@
         height: 48px;
         flex: 0 0 64px;
         border-radius: 5px;
-        background: #272832;
+        background: #15364b;
         object-fit: cover;
       }
 
@@ -323,7 +946,7 @@
 
       .games-content p {
         margin: 0;
-        color: #b7b8c2;
+        color: #a9c9d9;
       }
 
       #player {
@@ -345,15 +968,15 @@
         align-items: center;
         gap: 16px;
         padding: 8px 16px;
-        background: #191a20;
-        color: #fff;
+        background: #102b3e;
+        color: #eaf8ff;
       }
 
       .player-toolbar button {
         padding: 8px 12px;
-        border: 1px solid #555764;
+        border: 1px solid #3c7898;
         border-radius: 6px;
-        background: #272832;
+        background: #15364b;
         color: inherit;
         font: inherit;
         cursor: pointer;
@@ -367,7 +990,7 @@
 
       #game-status {
         margin: 0 0 0 auto;
-        color: #b7b8c2;
+        color: #a9c9d9;
         font-size: 0.9rem;
       }
 
@@ -379,17 +1002,42 @@
       }
 
       @media (max-width: 700px) {
-        .home-sidebar {
-          width: 200px;
-          padding: 12px 8px;
+        .home-sidebar-open-button {
+          top: 14px;
+          left: 10px;
         }
 
-        .home-screen.sidebar-collapsed .home-sidebar {
-          width: 64px;
+        .home-screen.sidebar-open .home-sidebar-open-button {
+          left: 76px;
         }
 
         .home-content {
-          padding: 20px;
+          align-content: start;
+          gap: 22px;
+          padding: 82px 20px 24px;
+        }
+
+        .home-content h1 {
+          font-size: clamp(3.5rem, 18vw, 6rem);
+        }
+
+        .home-dashboard {
+          gap: 18px;
+        }
+
+        .shortcut-icon {
+          width: 52px;
+          height: 52px;
+          border-radius: 16px;
+        }
+
+        .shortcut-icon svg {
+          width: 24px;
+          height: 24px;
+        }
+
+        .home-shortcut-label {
+          font-size: 0.76rem;
         }
 
         .games-layout {
@@ -408,28 +1056,192 @@
           padding: 20px;
         }
       }
+
+      @media (max-width: 520px) {
+        .home-shortcuts {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          row-gap: 14px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .shortcut-icon,
+        .home-search button,
+        .brand-tagline {
+          transition: none;
+        }
+
+        .creator-card {
+          animation: none;
+        }
+
+        .creator-enter {
+          transition: none;
+        }
+
+        .brand-tagline.is-changing {
+          transform: none;
+          filter: none;
+        }
+      }
     </style>
   </head>
   <body>
-    <main id="home-screen" class="screen home-screen">
-      <aside id="home-sidebar" class="home-sidebar" aria-label="Homepage navigation">
-        <button
-          id="home-sidebar-toggle"
-          class="home-sidebar-toggle"
-          type="button"
-          aria-controls="home-sidebar"
-          aria-expanded="true"
-          aria-label="Collapse homepage sidebar"
-        >
-          ‹
-        </button>
-        <button id="open-games" class="games-launcher" type="button">
-          <img src="Games/assets/games-icon.png" alt="" />
-          <span>Games</span>
+    <section id="creator-gate" class="creator-gate" aria-labelledby="creator-gate-title">
+      <div class="creator-card">
+        <header class="creator-header">
+          <h1 id="creator-gate-title">Welcome to FrostZ!</h1>
+          <button id="creator-close" class="creator-close" type="button" aria-label="Close welcome">×</button>
+        </header>
+        <div class="creator-body">
+          <p class="creator-intro">Step into a frosty new place to explore. Welcome to the Icebound Arcade.</p>
+          <p class="creator-kicker">Meet the creator</p>
+          <div class="creator-profile">
+            <img class="creator-avatar" src="Games/assets/creator-avatar.png" alt="Can's profile picture" />
+            <div class="creator-profile-info">
+              <p class="creator-name">Can</p>
+              <span class="creator-discord">@chiboy94.</span>
+            </div>
+          </div>
+        </div>
+        <footer class="creator-footer">
+          <p class="creator-footer-note">Please enjoy your stay!</p>
+          <button id="creator-enter" class="creator-enter" type="button" autofocus>Next</button>
+        </footer>
+      </div>
+    </section>
+    <main id="home-screen" class="screen home-screen" aria-hidden="true" inert>
+      <button
+        id="home-sidebar-open-button"
+        class="home-sidebar-open-button"
+        type="button"
+        aria-controls="home-sidebar"
+        aria-expanded="false"
+        aria-label="Open homepage sidebar"
+        title="Open sidebar"
+      >
+        ☰
+      </button>
+      <aside
+        id="home-sidebar"
+        class="home-sidebar"
+        aria-label="Homepage navigation"
+        aria-hidden="true"
+        inert
+      >
+        <nav class="home-sidebar-nav" aria-label="Explore">
+          <button id="open-games" class="games-launcher" type="button">
+            <img src="Games/assets/games-icon.png" alt="" />
+            <span class="launcher-label">Games</span>
+          </button>
+          <a
+            id="open-movies"
+            class="games-launcher"
+            href="Games/Apps/Movie.html"
+            aria-label="Movies"
+            title="Movies"
+          >
+            <span class="launcher-icon" aria-hidden="true">
+              <svg class="launcher-icon-svg" viewBox="0 0 32 32" fill="none">
+                <defs>
+                  <linearGradient id="movie-ice" x1="5" y1="6" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#f0fdff" />
+                    <stop offset=".48" stop-color="#8ce5ff" />
+                    <stop offset="1" stop-color="#43a9d8" />
+                  </linearGradient>
+                </defs>
+                <path d="M5 12.5h22v14H5z" fill="url(#movie-ice)" fill-opacity=".2" stroke="url(#movie-ice)" stroke-width="1.8" stroke-linejoin="round" />
+                <path d="m6.2 10.1 1-5.3 20.6 3.9-1 5.3L6.2 10.1Z" fill="url(#movie-ice)" fill-opacity=".27" stroke="url(#movie-ice)" stroke-width="1.8" stroke-linejoin="round" />
+                <path d="m11 5.9 3.1 5.4M18.5 7.3l3.1 5.4" stroke="#e9fbff" stroke-opacity=".9" stroke-width="1.6" stroke-linecap="round" />
+                <path d="M10 18h12M10 22h7" stroke="#dff9ff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M25.5 19.5v5m-2.5-2.5h5m-4.27-1.77 3.54 3.54m0-3.54-3.54 3.54" stroke="#f3feff" stroke-width="1.05" stroke-linecap="round" />
+              </svg>
+            </span>
+            <span class="launcher-label">Movies</span>
+          </a>
+        </nav>
+        <button id="open-settings" class="games-launcher settings-launcher" type="button">
+          <img src="Games/assets/settings-icon.png" alt="" />
+          <span class="launcher-label">Settings</span>
         </button>
       </aside>
+      <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
+        <h2 id="settings-title">Settings</h2>
+        <p>This settings panel is ready. Choose which settings you want to add here.</p>
+        <form method="dialog">
+          <button class="settings-dialog-close" type="submit">Close</button>
+        </form>
+      </dialog>
       <div class="home-content">
-        <h1>FrostZ</h1>
+        <div class="brand-lockup">
+          <h1 id="frostz-title" aria-label="FrostZ" tabindex="0">
+            <span aria-hidden="true">F</span><span aria-hidden="true">r</span><span aria-hidden="true">o</span><span aria-hidden="true">s</span><span aria-hidden="true">t</span><span aria-hidden="true">Z</span>
+          </h1>
+          <p id="brand-tagline" class="brand-tagline" aria-live="polite"></p>
+        </div>
+        <section class="home-dashboard" aria-label="FrostZ home dashboard">
+          <form class="home-search" role="search" aria-label="Browser search">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <circle cx="10.8" cy="10.8" r="6.8" fill="none" stroke="currentColor" stroke-width="1.8" />
+              <path d="m16 16 4.3 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+            <label class="sr-only" for="home-search-input">Search the web</label>
+            <input id="home-search-input" type="search" placeholder="Browser search coming soon..." autocomplete="off" disabled />
+            <button type="button" aria-label="Browser search coming soon" title="Browser coming soon" disabled>
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </form>
+          <nav class="home-shortcuts" aria-label="Apps">
+            <button class="home-shortcut" id="shortcut-games" type="button">
+              <span class="shortcut-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M7.5 7h9a4 4 0 0 1 3.8 2.8l1.1 3.5a2.5 2.5 0 0 1-4.1 2.6l-2.1-1.8H8.8l-2.1 1.8a2.5 2.5 0 0 1-4.1-2.6l1.1-3.5A4 4 0 0 1 7.5 7Z"/><path d="M7 10v4m-2-2h4m7-1h.01M18 13h.01"/></svg>
+              </span>
+              <span class="home-shortcut-label">Games</span>
+            </button>
+            <a class="home-shortcut" href="Games/Apps/Movie.html">
+              <span class="shortcut-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 8.5h16v11H4z"/><path d="m4.5 7.5 1-4 14 3-1 4z"/><path d="m8 4 2 4m4-3 2 4m-8 4h8m-8 3h5"/></svg>
+              </span>
+              <span class="home-shortcut-label">Movies</span>
+            </a>
+            <button class="home-shortcut" type="button" disabled title="Coming soon">
+              <span class="shortcut-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 3 14 9l6 1-5 3.5 1.5 6L12 16l-4.5 3.5L9 13.5 4 10l6-1z"/><path d="M18.5 3.5v3m-1.5-1.5h3M5 16v3m-1.5-1.5h3"/></svg>
+              </span>
+              <span class="home-shortcut-label">AI</span>
+            </button>
+            <button class="home-shortcut" type="button" disabled title="Coming soon">
+              <span class="shortcut-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+              </span>
+              <span class="home-shortcut-label">Music</span>
+            </button>
+            <button class="home-shortcut" type="button" disabled title="Coming soon">
+              <span class="shortcut-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 5h13a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-6l-4 3v-3H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M8 9h.01M12 9h.01M16 9h.01"/></svg>
+              </span>
+              <span class="home-shortcut-label">Chat</span>
+            </button>
+            <button class="home-shortcut" id="shortcut-all-apps" type="button" disabled title="App library coming soon">
+              <span class="shortcut-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg>
+              </span>
+              <span class="home-shortcut-label">All Apps</span>
+            </button>
+            <button class="home-shortcut" type="button" disabled title="More apps coming soon">
+              <span class="shortcut-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              </span>
+              <span class="home-shortcut-label">Add</span>
+            </button>
+          </nav>
+          <div class="home-clock" aria-label="Current date and time">
+            <time id="home-clock-time"></time>
+            <time id="home-clock-date"></time>
+          </div>
+        </section>
       </div>
     </main>
 
@@ -604,6 +1416,68 @@
     </section>
 
     <script>
+      const frostzTitle = document.getElementById("frostz-title");
+      const creatorGate = document.getElementById("creator-gate");
+      const homeScreen = document.getElementById("home-screen");
+      function enterFrostZ() {
+        creatorGate.hidden = true;
+        homeScreen.inert = false;
+        homeScreen.setAttribute("aria-hidden", "false");
+        frostzTitle.focus({ preventScroll: true });
+      }
+      document.getElementById("creator-enter").addEventListener("click", enterFrostZ);
+      document.getElementById("creator-close").addEventListener("click", enterFrostZ);
+
+      const brandTagline = document.getElementById("brand-tagline");
+      const brandPhrases = [
+        "This Is My Main Project Now",
+        "Most Of The Icons Were Made By Can",
+        "Brr Chilly",
+        "Im Freezing.. HELP",
+        "I Still Don't Know The Time",
+        "FrostZ, More Like FrostY!",
+        "I Like The Background",
+      ];
+      let brandPhraseIndex = Math.floor(Math.random() * brandPhrases.length);
+      brandTagline.textContent = brandPhrases[brandPhraseIndex];
+      if (brandPhrases.length > 1) {
+        window.setInterval(() => {
+          const nextPhraseIndex =
+            (brandPhraseIndex +
+              1 +
+              Math.floor(Math.random() * (brandPhrases.length - 1))) %
+            brandPhrases.length;
+          brandPhraseIndex = nextPhraseIndex;
+          brandTagline.classList.add("is-changing");
+          window.setTimeout(() => {
+            brandTagline.textContent = brandPhrases[brandPhraseIndex];
+            brandTagline.classList.remove("is-changing");
+          }, 350);
+        }, 4500);
+      }
+
+      const hoverEffects = ["scatter", "wave", "shiver"];
+      let previousHoverEffect = "";
+
+      function playRandomTitleEffect() {
+        const availableEffects = hoverEffects.filter(
+          (effect) => effect !== previousHoverEffect,
+        );
+        const effect =
+          availableEffects[Math.floor(Math.random() * availableEffects.length)];
+        previousHoverEffect = effect;
+        frostzTitle.dataset.hoverEffect = effect;
+      }
+
+      function clearTitleEffect() {
+        delete frostzTitle.dataset.hoverEffect;
+      }
+
+      frostzTitle.addEventListener("pointerenter", playRandomTitleEffect);
+      frostzTitle.addEventListener("pointerleave", clearTitleEffect);
+      frostzTitle.addEventListener("focus", playRandomTitleEffect);
+      frostzTitle.addEventListener("blur", clearTitleEffect);
+
       const catalog = document.getElementById("catalog");
       const player = document.getElementById("player");
       let frame = document.getElementById("game-frame");
@@ -612,24 +1486,53 @@
       const search = document.getElementById("game-search");
       const remoteGames = document.getElementById("remote-games");
       const libraryStatus = document.getElementById("library-status");
-      const homeScreen = document.getElementById("home-screen");
+      const homeSidebar = document.getElementById("home-sidebar");
+      const settingsDialog = document.getElementById("settings-dialog");
       const gamesLayout = document.getElementById("games-layout");
       const sidebarToggle = document.getElementById("sidebar-toggle");
-      const homeSidebarToggle = document.getElementById("home-sidebar-toggle");
-
-      document.getElementById("open-games").addEventListener("click", () => {
+      const homeSidebarOpenButton = document.getElementById("home-sidebar-open-button");
+      function showCatalog() {
         homeScreen.hidden = true;
         catalog.hidden = false;
+        search.value = "";
+        filterGames();
+      }
+
+      document.getElementById("open-games").addEventListener("click", () => {
+        showCatalog();
+      });
+      document.getElementById("shortcut-games").addEventListener("click", () => showCatalog());
+
+      function updateHomeClock() {
+        const now = new Date();
+        document.getElementById("home-clock-time").textContent = now.toLocaleTimeString(
+          undefined,
+          { hour: "numeric", minute: "2-digit" },
+        );
+        document.getElementById("home-clock-date").textContent = now.toLocaleDateString(
+          undefined,
+          { weekday: "long", month: "long", day: "numeric" },
+        );
+      }
+
+      updateHomeClock();
+      window.setInterval(updateHomeClock, 1000);
+
+      homeSidebarOpenButton.addEventListener("click", () => {
+        const open = homeScreen.classList.toggle("sidebar-open");
+        homeSidebar.inert = !open;
+        homeSidebar.setAttribute("aria-hidden", String(!open));
+        homeSidebarOpenButton.textContent = open ? "×" : "☰";
+        homeSidebarOpenButton.setAttribute("aria-expanded", String(open));
+        homeSidebarOpenButton.setAttribute(
+          "aria-label",
+          open ? "Close homepage sidebar" : "Open homepage sidebar",
+        );
+        homeSidebarOpenButton.title = open ? "Close sidebar" : "Open sidebar";
       });
 
-      homeSidebarToggle.addEventListener("click", () => {
-        const collapsed = homeScreen.classList.toggle("sidebar-collapsed");
-        homeSidebarToggle.textContent = collapsed ? "›" : "‹";
-        homeSidebarToggle.setAttribute("aria-expanded", String(!collapsed));
-        homeSidebarToggle.setAttribute(
-          "aria-label",
-          collapsed ? "Expand homepage sidebar" : "Collapse homepage sidebar",
-        );
+      document.getElementById("open-settings").addEventListener("click", () => {
+        settingsDialog.showModal();
       });
 
       function goHome() {
