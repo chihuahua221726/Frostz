@@ -50,13 +50,6 @@
         text-align: center;
       }
 
-      .home-actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 18px;
-      }
-
       .home-content h1 {
         margin: 0;
         color: #fff;
@@ -96,31 +89,6 @@
       .games-launcher span {
         font-size: 1.1rem;
         font-weight: 700;
-      }
-
-      .movies-launcher {
-        display: grid;
-        place-items: center;
-        min-width: 112px;
-        min-height: 112px;
-        padding: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.75);
-        border-radius: 12px;
-        background: rgba(16, 17, 22, 0.45);
-        color: #fff;
-        font: inherit;
-        font-size: 1.1rem;
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: none;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-        transition: background 160ms ease, transform 160ms ease;
-      }
-
-      .movies-launcher:hover,
-      .movies-launcher:focus-visible {
-        transform: scale(1.06);
-        background: rgba(16, 17, 22, 0.75);
       }
 
       .games-screen {
@@ -368,13 +336,10 @@
     <main id="home-screen" class="screen home-screen">
       <div class="home-content">
         <h1>FrostZ</h1>
-        <div class="home-actions">
-          <button id="open-games" class="games-launcher" type="button">
-            <img src="Games/assets/games-icon.png" alt="" />
-            <span>Games</span>
-          </button>
-          <a class="movies-launcher" href="Movie.html">Movies</a>
-        </div>
+        <button id="open-games" class="games-launcher" type="button">
+          <img src="Games/assets/games-icon.png" alt="" />
+          <span>Games</span>
+        </button>
       </div>
     </main>
 

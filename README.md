@@ -3,7 +3,7 @@ Random Side Project Because We Were Bored
 
 ## Games
 
-- Open [FrostZ](index.html), then choose Games to open the games sidebar or Movies to open [Movie.html](Movie.html).
+- Open [FrostZ](index.html), then choose the gamepad icon to open the games sidebar.
 - [Birthday Bash](Games/Birthdaybash.html)
 - [Boil Noodles at Night](Games/Boilnootiles.html)
 - [Cheese Rolling](Games/Cheeserolling.html)
