@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Frostz Games</title>
+    <title>FrostZ</title>
     <style>
       * {
         box-sizing: border-box;
@@ -15,22 +15,6 @@
         background: #101116;
         color: #f5f5f7;
         font-family: Arial, sans-serif;
-      }
-
-      main {
-        width: min(100% - 40px, 1000px);
-        margin: 0 auto;
-        padding: 64px 0;
-      }
-
-      h1 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 5vw, 3.5rem);
-      }
-
-      .intro {
-        margin: 0 0 36px;
-        color: #b7b8c2;
       }
 
       .sr-only {
@@ -45,58 +29,232 @@
         border: 0;
       }
 
+      .screen[hidden] {
+        display: none;
+      }
+
+      .home-screen {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 32px;
+        background:
+          linear-gradient(rgba(7, 18, 35, 0.28), rgba(7, 18, 35, 0.5)),
+          url("Games/assets/home-background.png") center / cover fixed;
+      }
+
+      .home-content {
+        display: grid;
+        justify-items: center;
+        gap: 30px;
+        text-align: center;
+      }
+
+      .home-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 18px;
+      }
+
+      .home-content h1 {
+        margin: 0;
+        color: #fff;
+        font-size: clamp(4rem, 14vw, 9rem);
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        text-shadow: 0 5px 24px rgba(0, 0, 0, 0.6);
+      }
+
+      .games-launcher {
+        display: grid;
+        justify-items: center;
+        gap: 10px;
+        padding: 8px;
+        border: 0;
+        border-radius: 12px;
+        background: transparent;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+      }
+
+      .games-launcher img {
+        width: 96px;
+        height: 96px;
+        object-fit: contain;
+        transition: transform 160ms ease;
+      }
+
+      .games-launcher:hover img,
+      .games-launcher:focus-visible img {
+        transform: scale(1.12);
+      }
+
+      .games-launcher span {
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+
+      .movies-launcher {
+        display: grid;
+        place-items: center;
+        min-width: 112px;
+        min-height: 112px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.75);
+        border-radius: 12px;
+        background: rgba(16, 17, 22, 0.45);
+        color: #fff;
+        font: inherit;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+        transition: background 160ms ease, transform 160ms ease;
+      }
+
+      .movies-launcher:hover,
+      .movies-launcher:focus-visible {
+        transform: scale(1.06);
+        background: rgba(16, 17, 22, 0.75);
+      }
+
+      .games-screen {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #101116;
+      }
+
+      .games-header {
+        display: flex;
+        min-height: 64px;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 20px;
+        border-bottom: 1px solid #343640;
+        background: #191a20;
+      }
+
+      .games-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .header-button {
+        display: inline-flex;
+        min-width: 42px;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border: 1px solid #555764;
+        border-radius: 7px;
+        background: #272832;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .games-layout {
+        min-height: 0;
+        flex: 1;
+        display: grid;
+        grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+        transition: grid-template-columns 180ms ease;
+      }
+
+      .games-layout.sidebar-collapsed {
+        grid-template-columns: 0 minmax(0, 1fr);
+      }
+
+      .games-sidebar {
+        height: 100%;
+        min-width: 0;
+        overflow: auto;
+        border-right: 1px solid #343640;
+        background: #17181e;
+        transition: visibility 180ms ease;
+      }
+
+      .sidebar-collapsed .games-sidebar {
+        visibility: hidden;
+        overflow: hidden;
+      }
+
       .game-search {
         width: 100%;
-        margin: 0 0 28px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        margin: 0;
         padding: 12px 14px;
-        border: 1px solid #343640;
-        border-radius: 8px;
-        background: #1b1c23;
+        border: 0;
+        border-bottom: 1px solid #343640;
+        border-radius: 0;
+        background: #17181e;
         color: #f5f5f7;
         font: inherit;
       }
 
-      .game-library {
-        margin-top: 48px;
-      }
-
-      .game-library h2 {
-        margin-bottom: 8px;
+      .game-group-title {
+        margin: 18px 14px 8px;
+        color: #b7b8c2;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
       #library-status {
+        margin: 8px 14px;
         color: #b7b8c2;
+        font-size: 0.85rem;
       }
 
       .games {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-        gap: 24px;
+        gap: 4px;
+        padding: 0 8px 12px;
       }
 
       .game-card {
-        padding: 0;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        gap: 12px;
+        padding: 8px;
         overflow: hidden;
-        border: 1px solid #343640;
-        border-radius: 14px;
-        background: #1b1c23;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
         color: inherit;
         font: inherit;
         text-align: left;
         cursor: pointer;
-        transition: border-color 150ms ease, transform 150ms ease;
+        transition: border-color 150ms ease, background 150ms ease;
+      }
+
+      .game-card[hidden] {
+        display: none;
       }
 
       .game-card:hover,
       .game-card:focus-visible {
-        transform: translateY(-3px);
         border-color: #9c8cff;
+        background: #252630;
       }
 
       .game-photo {
         display: block;
-        width: 100%;
-        height: 190px;
+        width: 64px;
+        height: 48px;
+        flex: 0 0 64px;
+        border-radius: 5px;
         background: #272832;
         object-fit: cover;
       }
@@ -106,16 +264,32 @@
       }
 
       .game-details {
-        display: grid;
-        gap: 8px;
-        padding: 18px;
-      }
-
-      .game-details strong {
-        font-size: 1.2rem;
+        min-width: 0;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .game-details span {
+        display: none;
+      }
+
+      .games-content {
+        display: grid;
+        min-width: 0;
+        place-content: center;
+        padding: 32px;
+        text-align: center;
+      }
+
+      .games-content h2 {
+        margin: 0 0 8px;
+        font-size: clamp(1.8rem, 4vw, 3rem);
+      }
+
+      .games-content p {
+        margin: 0;
         color: #b7b8c2;
       }
 
@@ -171,29 +345,66 @@
         border: 0;
       }
 
-      @media (max-width: 600px) {
-        main {
-          padding: 40px 0;
+      @media (max-width: 700px) {
+        .games-layout {
+          grid-template-columns: minmax(220px, 75vw) minmax(0, 1fr);
         }
 
-        .game-photo {
-          min-height: 160px;
+        .games-layout.sidebar-collapsed {
+          grid-template-columns: 0 minmax(0, 1fr);
+        }
+
+        .games-header {
+          padding: 8px 12px;
+        }
+
+        .games-content {
+          padding: 20px;
         }
       }
     </style>
   </head>
   <body>
-    <main id="catalog">
-      <h1>Frostz Games</h1>
-      <p class="intro">Pick a game to play.</p>
-      <label class="sr-only" for="game-search">Search games</label>
-      <input
-        class="game-search"
-        id="game-search"
-        type="search"
-        placeholder="Search games..."
-      />
-      <section class="games" aria-label="Games">
+    <main id="home-screen" class="screen home-screen">
+      <div class="home-content">
+        <h1>FrostZ</h1>
+        <div class="home-actions">
+          <button id="open-games" class="games-launcher" type="button">
+            <img src="Games/assets/games-icon.png" alt="" />
+            <span>Games</span>
+          </button>
+          <a class="movies-launcher" href="Movie.html">Movies</a>
+        </div>
+      </div>
+    </main>
+
+    <section id="catalog" class="screen games-screen" hidden>
+      <header class="games-header">
+        <button id="home-button" class="header-button" type="button" aria-label="Home">
+          Home
+        </button>
+        <button
+          id="sidebar-toggle"
+          class="header-button"
+          type="button"
+          aria-controls="games-sidebar"
+          aria-expanded="true"
+        >
+          Hide games
+        </button>
+        <h1>FrostZ Games</h1>
+      </header>
+      <div id="games-layout" class="games-layout">
+        <aside id="games-sidebar" class="games-sidebar" aria-label="Game list">
+          <label class="sr-only" for="game-search">Search games</label>
+          <input
+            class="game-search"
+            id="game-search"
+            type="search"
+            placeholder="Search games..."
+          />
+          <h2 class="game-group-title">FrostZ Games</h2>
+          <div class="games" id="local-games" aria-label="FrostZ games">
         <button
           class="game-card"
           type="button"
@@ -306,15 +517,21 @@
             <span>Click to play</span>
           </span>
         </button>
-      </section>
-      <section class="game-library" aria-labelledby="library-title">
-        <h2 id="library-title">More Games</h2>
-        <p id="library-status" role="status" aria-live="polite">
-          Loading games...
-        </p>
-        <div class="games" id="remote-games" aria-label="More games"></div>
-      </section>
-    </main>
+          </div>
+          <h2 class="game-group-title">More Games</h2>
+          <p id="library-status" role="status" aria-live="polite">
+            Loading games...
+          </p>
+          <div class="games" id="remote-games" aria-label="More games"></div>
+        </aside>
+        <main class="games-content">
+          <div>
+            <h2>Choose a game</h2>
+            <p>Pick a game from the sidebar to start playing.</p>
+          </div>
+        </main>
+      </div>
+    </section>
 
     <section id="player" aria-label="Game player" aria-hidden="true">
       <div class="player-toolbar">
@@ -334,13 +551,32 @@
       const search = document.getElementById("game-search");
       const remoteGames = document.getElementById("remote-games");
       const libraryStatus = document.getElementById("library-status");
-      let activeGameController = null;
+      const homeScreen = document.getElementById("home-screen");
+      const gamesLayout = document.getElementById("games-layout");
+      const sidebarToggle = document.getElementById("sidebar-toggle");
 
-      async function openGame(card) {
-        if (activeGameController) {
-          activeGameController.abort();
-        }
-        activeGameController = null;
+      document.getElementById("open-games").addEventListener("click", () => {
+        homeScreen.hidden = true;
+        catalog.hidden = false;
+      });
+
+      function goHome() {
+        frame.src = "about:blank";
+        player.classList.remove("active");
+        player.setAttribute("aria-hidden", "true");
+        catalog.hidden = true;
+        homeScreen.hidden = false;
+      }
+
+      document.getElementById("home-button").addEventListener("click", goHome);
+
+      sidebarToggle.addEventListener("click", () => {
+        const collapsed = gamesLayout.classList.toggle("sidebar-collapsed");
+        sidebarToggle.textContent = collapsed ? "Show games" : "Hide games";
+        sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+      });
+
+      function openGame(card) {
         title.textContent = card.dataset.title;
         catalog.hidden = true;
         player.classList.add("active");
@@ -353,83 +589,16 @@
         frame.replaceWith(freshFrame);
         frame = freshFrame;
 
-        if (card.dataset.remote !== "true") {
-          gameStatus.textContent = "";
-          frame.src = card.dataset.src;
-          return;
-        }
-
-        frame.sandbox.add(
-          "allow-scripts",
-          "allow-forms",
-          "allow-pointer-lock",
-          "allow-downloads",
-          "allow-popups",
-          "allow-popups-to-escape-sandbox",
-          "allow-presentation",
+        gameStatus.textContent =
+          card.dataset.remote === "true" ? "Loading game..." : "";
+        frame.addEventListener(
+          "load",
+          () => {
+            gameStatus.textContent = "";
+          },
+          { once: true },
         );
-        gameStatus.textContent = "Loading game...";
-        const controller = new AbortController();
-        activeGameController = controller;
-        const timeout = setTimeout(() => {
-          controller.abort();
-          if (activeGameController === controller) {
-            activeGameController = null;
-            gameStatus.textContent =
-              "The game took too long to load. Check your connection and try again.";
-          }
-        }, 60000);
-
-        try {
-          const response = await fetch(card.dataset.src, {
-            signal: controller.signal,
-          });
-          if (!response.ok) {
-            throw new Error(`Game request failed (${response.status})`);
-          }
-          const gameHtml = await response.text();
-          if (controller.signal.aborted) {
-            return;
-          }
-
-          const gameDocument = new DOMParser().parseFromString(
-            gameHtml,
-            "text/html",
-          );
-          if (!gameDocument.querySelector("base[href]")) {
-            const base = gameDocument.createElement("base");
-            base.href = new URL(".", card.dataset.src).href;
-            gameDocument.head.prepend(base);
-          }
-
-          const gameBlobUrl = URL.createObjectURL(
-            new Blob(
-              [`<!doctype html>\n${gameDocument.documentElement.outerHTML}`],
-              { type: "text/html" },
-            ),
-          );
-          frame.addEventListener(
-            "load",
-            () => {
-              URL.revokeObjectURL(gameBlobUrl);
-              gameStatus.textContent = "";
-            },
-            { once: true },
-          );
-          frame.src = gameBlobUrl;
-        } catch (error) {
-          if (controller.signal.aborted) {
-            return;
-          }
-          console.error(`Could not load ${card.dataset.title}:`, error);
-          gameStatus.textContent =
-            "The game could not be loaded. Check your connection and try again.";
-        } finally {
-          clearTimeout(timeout);
-          if (activeGameController === controller) {
-            activeGameController = null;
-          }
-        }
+        frame.src = card.dataset.src;
       }
 
       function filterGames() {
@@ -450,7 +619,7 @@
       async function loadMoreGames() {
         const zonesUrl =
           "https://cdn.jsdelivr.net/gh/freebuisness/assets@main/zones.json";
-        const htmlBase = "https://cdn.jsdelivr.net/gh/freebuisness/html@main";
+        const htmlBase = "https://raw.githack.com/freebuisness/html/main";
         const coverBase = "https://cdn.jsdelivr.net/gh/freebuisness/covers@main";
 
         try {
@@ -482,7 +651,7 @@
             if (
               gameUrl.protocol !== "https:" ||
               coverUrl.protocol !== "https:" ||
-              gameUrl.hostname !== "cdn.jsdelivr.net" ||
+              gameUrl.hostname !== "raw.githack.com" ||
               coverUrl.hostname !== "cdn.jsdelivr.net"
             ) {
               return;
@@ -530,10 +699,6 @@
       loadMoreGames();
 
       document.getElementById("back-button").addEventListener("click", () => {
-        if (activeGameController) {
-          activeGameController.abort();
-        }
-        activeGameController = null;
         frame.src = "about:blank";
         gameStatus.textContent = "";
         player.classList.remove("active");
