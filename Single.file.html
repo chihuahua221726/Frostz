@@ -549,23 +549,25 @@
         width: 44px;
         height: 44px;
         place-items: center;
-        border: 1px solid rgba(173, 235, 255, 0.55);
+        border: 1px solid transparent;
         border-radius: 12px;
-        background: rgba(8, 39, 61, 0.28);
-        box-shadow: 0 4px 20px rgba(0, 12, 24, 0.12);
-        color: rgba(234, 248, 255, 0.78);
+        background: transparent;
+        box-shadow: none;
+        color: #eaf8ff;
         font: inherit;
         font-size: 1.35rem;
         cursor: pointer;
-        backdrop-filter: blur(12px);
-        transition: left 220ms ease, background 160ms ease, box-shadow 160ms ease;
+        transition: left 220ms ease, color 160ms ease, text-shadow 160ms ease;
       }
 
       .home-sidebar-open-button:hover,
       .home-sidebar-open-button:focus-visible {
-        background: rgba(44, 119, 153, 0.62);
-        box-shadow: 0 0 22px rgba(83, 200, 242, 0.32);
-        outline: none;
+        background: transparent;
+        box-shadow: none;
+        color: #fff;
+        text-shadow: 0 0 12px rgba(132, 226, 255, 0.9);
+        outline: 2px solid rgba(190, 238, 255, 0.72);
+        outline-offset: 2px;
       }
 
       .home-screen.sidebar-open .home-sidebar-open-button {
@@ -747,6 +749,48 @@
 
       .home-search input::placeholder {
         color: #aac3d0;
+      }
+
+      .home-search .rotating-search-placeholder {
+        flex: 1;
+        color: #aac3d0;
+        text-align: left;
+        transition: opacity 350ms ease, transform 350ms ease, filter 350ms ease;
+      }
+
+      .home-search .rotating-search-placeholder::placeholder {
+        color: #aac3d0;
+        opacity: 1;
+      }
+
+      .home-search .rotating-search-placeholder.is-changing {
+        animation: search-placeholder-exit 260ms ease-in forwards;
+      }
+
+      .home-search .rotating-search-placeholder.is-entering {
+        animation: search-placeholder-enter 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+
+      @keyframes search-placeholder-exit {
+        to {
+          opacity: 0;
+          transform: translateX(12px);
+          filter: blur(2px);
+        }
+      }
+
+      @keyframes search-placeholder-enter {
+        from {
+          opacity: 0;
+          transform: translateX(-12px);
+          filter: blur(2px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateX(0);
+          filter: blur(0);
+        }
       }
 
       .home-search:focus-within {
@@ -1010,6 +1054,8 @@
       }
 
       .games-screen {
+        position: relative;
+        z-index: 1;
         height: 100vh;
         display: flex;
         flex-direction: column;
@@ -1202,6 +1248,7 @@
 
       #player {
         position: fixed;
+        z-index: 2;
         inset: 0;
         display: none;
         background: #000;
@@ -1318,6 +1365,7 @@
       @media (prefers-reduced-motion: reduce) {
         .shortcut-icon,
         .home-search button,
+        .rotating-search-placeholder,
         .brand-tagline {
           transition: none;
         }
@@ -1333,6 +1381,18 @@
         .brand-tagline.is-changing {
           transform: none;
           filter: none;
+        }
+
+        .rotating-search-placeholder.is-changing {
+          transform: none;
+          filter: none;
+          animation: none;
+        }
+
+        .rotating-search-placeholder.is-entering {
+          transform: none;
+          filter: none;
+          animation: none;
         }
       }
     </style>
@@ -1451,7 +1511,7 @@
               <path d="m16 16 4.3 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
             </svg>
             <label class="sr-only" for="home-search-input">Search the web</label>
-            <input id="home-search-input" type="search" placeholder="Browser search coming soon..." autocomplete="off" disabled />
+            <input id="home-search-input" class="rotating-search-placeholder" type="search" placeholder="" autocomplete="off" disabled />
             <button type="button" aria-label="Browser search coming soon" title="Browser coming soon" disabled>
               <svg aria-hidden="true" viewBox="0 0 24 24">
                 <path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -1739,6 +1799,36 @@
       document.getElementById("creator-close").addEventListener("click", enterFrostZ);
 
       const brandTagline = document.getElementById("brand-tagline");
+      const searchPlaceholder = document.getElementById("home-search-input");
+      const searchPhrases = [
+        "Searching For my Life Choices",
+        "Searching For..",
+        "Why Do You Want To Search Something Bub",
+        "Must Be Nice Not Being Cold",
+      ];
+      let searchPhraseIndex = Math.floor(Math.random() * searchPhrases.length);
+      searchPlaceholder.placeholder = searchPhrases[searchPhraseIndex];
+      let nextSearchPhraseIndex = searchPhraseIndex;
+      while (nextSearchPhraseIndex === searchPhraseIndex) {
+        nextSearchPhraseIndex = Math.floor(Math.random() * searchPhrases.length);
+      }
+      window.setInterval(() => {
+        searchPlaceholder.classList.add("is-changing");
+        window.setTimeout(() => {
+          searchPhraseIndex = nextSearchPhraseIndex;
+          searchPlaceholder.placeholder = searchPhrases[searchPhraseIndex];
+          searchPlaceholder.classList.remove("is-changing");
+          searchPlaceholder.classList.add("is-entering");
+          window.setTimeout(() => {
+            searchPlaceholder.classList.remove("is-entering");
+            nextSearchPhraseIndex = searchPhraseIndex;
+            while (nextSearchPhraseIndex === searchPhraseIndex) {
+              nextSearchPhraseIndex = Math.floor(Math.random() * searchPhrases.length);
+            }
+          }, 420);
+        }, 260);
+      }, 6200);
+
       const brandPhrases = [
         "This Is My Main Project Now",
         "Most Of The Icons Were Made By Can",
