@@ -9,6 +9,8 @@ Random Side Project Because We Were Bored
 - [Cheese Rolling](Games/Cheeserolling.html)
 - [Beatblock](Games/Beatblock.html)
 - [Thirty Dollar Website](Games/30dollarwebsite.html)
+- [Brotato](Games/Brotato.html)
+- [InkWave](Games/InkWave.html)
 
 The games load their Unity WebGL builds from the CDN URLs in their HTML pages, so an internet connection is required.
 Game pages and cover images are stored in the `Games` folder.
