@@ -43,10 +43,24 @@
         overflow-y: auto;
         padding: 24px;
         background:
-          radial-gradient(ellipse at 50% 35%, rgba(84, 191, 231, 0.19), transparent 44%),
-          linear-gradient(rgba(3, 17, 29, 0.78), rgba(3, 18, 31, 0.9)),
-          url("Games/assets/home-background.png") center / cover;
-        backdrop-filter: blur(12px);
+          radial-gradient(ellipse at 50% 35%, rgba(84, 191, 231, 0.16), transparent 55%),
+          linear-gradient(rgba(3, 17, 29, 0.48), rgba(3, 18, 31, 0.68));
+        backdrop-filter: blur(7px);
+      }
+
+      .ambient-background {
+        position: fixed;
+        z-index: 0;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        background: #081724 url("Games/assets/home-background.png") center / cover;
+      }
+
+      .ambient-background[hidden] {
+        display: none;
       }
 
       .creator-card {
@@ -256,12 +270,13 @@
       }
 
       .home-screen {
+        position: relative;
+        z-index: 1;
         min-height: 100vh;
         display: flex;
         overflow: hidden;
         background:
-          linear-gradient(rgba(4, 23, 39, 0.24), rgba(5, 28, 47, 0.56)),
-          url("Games/assets/home-background.png") center / cover fixed;
+          linear-gradient(rgba(4, 23, 39, 0.24), rgba(5, 28, 47, 0.56));
       }
 
       .home-sidebar {
@@ -1087,6 +1102,19 @@
     </style>
   </head>
   <body>
+    <video
+      id="ambient-background"
+      class="ambient-background"
+      muted
+      loop
+      playsinline
+      preload="auto"
+      poster="Games/assets/home-background.png"
+      aria-hidden="true"
+      tabindex="-1"
+    >
+      <source src="Games/assets/home-background.mp4" type="video/mp4" />
+    </video>
     <section id="creator-gate" class="creator-gate" aria-labelledby="creator-gate-title">
       <div class="creator-card">
         <header class="creator-header">
@@ -1417,6 +1445,23 @@
 
     <script>
       const frostzTitle = document.getElementById("frostz-title");
+      const ambientBackground = document.getElementById("ambient-background");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      function syncBackgroundMotion() {
+        if (reducedMotion.matches) {
+          ambientBackground.pause();
+          return;
+        }
+
+        ambientBackground.play().catch((error) => {
+          console.warn("The background video could not start:", error);
+        });
+      }
+
+      syncBackgroundMotion();
+      reducedMotion.addEventListener("change", syncBackgroundMotion);
+
       const creatorGate = document.getElementById("creator-gate");
       const homeScreen = document.getElementById("home-screen");
       function enterFrostZ() {
