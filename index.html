@@ -173,6 +173,27 @@
         cursor: pointer;
       }
 
+      .home-button {
+        width: 44px;
+        height: 44px;
+        padding: 6px;
+        border-color: transparent;
+        background: transparent;
+      }
+
+      .home-button img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .home-button:hover,
+      .home-button:focus-visible {
+        border-color: #555764;
+        background: #272832;
+      }
+
       .games-layout {
         min-height: 0;
         flex: 1;
@@ -414,8 +435,14 @@
 
     <section id="catalog" class="screen games-screen" hidden>
       <header class="games-header">
-        <button id="home-button" class="header-button" type="button" aria-label="Home">
-          Home
+        <button
+          id="home-button"
+          class="header-button home-button"
+          type="button"
+          aria-label="Home"
+          title="Home"
+        >
+          <img src="Games/assets/home-icon.png" alt="" />
         </button>
         <button
           id="sidebar-toggle"
