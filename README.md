@@ -4,10 +4,11 @@ Random Side Project Because We Were Bored
 ## Games
 
 - Open the [Frostz Games catalog](index.html) to choose and play a game in the same window.
-- [Birthday Bash](Birthdaybash.html)
-- [Boil Noodles at Night](Boilnootiles.html)
-- [Cheese Rolling](Cheeserolling.html)
-- [Beatblock](Beatblock.html)
-- [Thirty Dollar Website](30dollarwebsite.html)
+- [Birthday Bash](Games/Birthdaybash.html)
+- [Boil Noodles at Night](Games/Boilnootiles.html)
+- [Cheese Rolling](Games/Cheeserolling.html)
+- [Beatblock](Games/Beatblock.html)
+- [Thirty Dollar Website](Games/30dollarwebsite.html)
 
 The games load their Unity WebGL builds from the CDN URLs in their HTML pages, so an internet connection is required.
+Game pages and cover images are stored in the `Games` folder.
