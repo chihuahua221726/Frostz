@@ -1,1 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Frostz Games</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        background: #101116;
+        color: #f5f5f7;
+        font-family: Arial, sans-serif;
+      }
+
+      main {
+        width: min(100% - 40px, 1000px);
+        margin: 0 auto;
+        padding: 64px 0;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+      }
+
+      .intro {
+        margin: 0 0 36px;
+        color: #b7b8c2;
+      }
+
+      .games {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+        gap: 24px;
+      }
+
+      .game-card {
+        padding: 0;
+        overflow: hidden;
+        border: 1px solid #343640;
+        border-radius: 14px;
+        background: #1b1c23;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: border-color 150ms ease, transform 150ms ease;
+      }
+
+      .game-card:hover,
+      .game-card:focus-visible {
+        transform: translateY(-3px);
+        border-color: #9c8cff;
+      }
+
+      .game-photo {
+        display: grid;
+        min-height: 190px;
+        place-items: center;
+        background: #272832;
+        color: #8f909c;
+        font-size: 0.9rem;
+      }
+
+      .game-details {
+        display: grid;
+        gap: 8px;
+        padding: 18px;
+      }
+
+      .game-details strong {
+        font-size: 1.2rem;
+      }
+
+      .game-details span {
+        color: #b7b8c2;
+      }
+
+      #player {
+        position: fixed;
+        inset: 0;
+        display: none;
+        background: #000;
+      }
+
+      #player.active {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .player-toolbar {
+        z-index: 1;
+        display: flex;
+        min-height: 52px;
+        align-items: center;
+        gap: 16px;
+        padding: 8px 16px;
+        background: #191a20;
+        color: #fff;
+      }
+
+      .player-toolbar button {
+        padding: 8px 12px;
+        border: 1px solid #555764;
+        border-radius: 6px;
+        background: #272832;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      #game-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      #game-frame {
+        width: 100%;
+        height: 100%;
+        flex: 1;
+        border: 0;
+      }
+
+      @media (max-width: 600px) {
+        main {
+          padding: 40px 0;
+        }
+
+        .game-photo {
+          min-height: 160px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="catalog">
+      <h1>Frostz Games</h1>
+      <p class="intro">Pick a game to play.</p>
+      <section class="games" aria-label="Games">
+        <button
+          class="game-card"
+          type="button"
+          data-title="Birthday Bash"
+          data-src="Birthdaybash.html"
+        >
+          <span class="game-photo" aria-hidden="true">Photo coming soon</span>
+          <span class="game-details">
+            <strong>Birthday Bash</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+        <button
+          class="game-card"
+          type="button"
+          data-title="Boil Noodles at Night"
+          data-src="Boilnootiles.html"
+        >
+          <span class="game-photo" aria-hidden="true">Photo coming soon</span>
+          <span class="game-details">
+            <strong>Boil Noodles at Night</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
+      </section>
+    </main>
+
+    <section id="player" aria-label="Game player" aria-hidden="true">
+      <div class="player-toolbar">
+        <button id="back-button" type="button">Back to games</button>
+        <strong id="game-title"></strong>
+      </div>
+      <iframe id="game-frame" title="Game" allow="fullscreen"></iframe>
+    </section>
+
+    <script>
+      const catalog = document.getElementById("catalog");
+      const player = document.getElementById("player");
+      const frame = document.getElementById("game-frame");
+      const title = document.getElementById("game-title");
+
+      document.querySelectorAll(".game-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          title.textContent = card.dataset.title;
+          frame.src = card.dataset.src;
+          catalog.hidden = true;
+          player.classList.add("active");
+          player.setAttribute("aria-hidden", "false");
+        });
+      });
+
+      document.getElementById("back-button").addEventListener("click", () => {
+        frame.src = "about:blank";
+        player.classList.remove("active");
+        player.setAttribute("aria-hidden", "true");
+        catalog.hidden = false;
+      });
+    </script>
+  </body>
+</html>
 
