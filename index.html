@@ -1163,6 +1163,10 @@
       }
     </style>
     <link rel="stylesheet" href="Effects/frostz-themes.css" />
+    <script src="/scram/scramjet.js"></script>
+    <script src="/controller/controller.api.js"></script>
+    <script src="/utils/utils.js"></script>
+    <script src="/libcurl/libcurl.js"></script>
   </head>
   <body>
     <video
@@ -1301,8 +1305,8 @@
               <path d="m16 16 4.3 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
             </svg>
             <label class="sr-only" for="home-search-input">Search the web</label>
-            <input id="home-search-input" class="rotating-search-placeholder" type="search" placeholder="" autocomplete="off" disabled />
-            <button type="button" aria-label="Browser search coming soon" title="Browser coming soon" disabled>
+            <input id="home-search-input" class="rotating-search-placeholder" type="search" placeholder="" autocomplete="off" />
+            <button type="button" aria-label="Search the web" title="Search the web">
               <svg aria-hidden="true" viewBox="0 0 24 24">
                 <path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -1923,6 +1927,58 @@
         player.setAttribute("aria-hidden", "true");
         catalog.hidden = false;
       });
+
+      // Scramjet-powered browser search
+      (async () => {
+        if (!("serviceWorker" in navigator)) return;
+        try {
+          const registration = await navigator.serviceWorker.register("/sw.js");
+          const serviceworker = navigator.serviceWorker.controller || registration.active;
+          const { Controller } = window.$scramjetController || {};
+          const LibcurlClient = window.LibcurlClient || (window.$scramjetLibcurl && window.$scramjetLibcurl.LibcurlClient);
+          const utils = window.$scramjetUtils || window.$scramjet;
+          if (!Controller || !LibcurlClient) return;
+          const wispUrl = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/wisp/";
+          const controller = new Controller({
+            serviceworker,
+            transport: new LibcurlClient({ wisp: wispUrl }),
+            config: {
+              scramjetPath: "/scram/scramjet.js",
+              wasmPath: "/scram/scramjet.wasm",
+              injectPath: "/controller/controller.inject.js",
+            },
+          });
+          await controller.wait();
+          const browserFrame = document.getElementById("game-frame");
+          const frame = controller.createFrame(browserFrame, {
+            plugins: utils
+              ? [new utils.HttpCachePlugin(), new utils.UrlWatcherPlugin((url) => console.log(url)), new utils.CatchEscapedLinksPlugin((url) => new URL(location.href))]
+              : [],
+          });
+
+          const searchForm = document.querySelector(".home-search");
+          const searchInput = document.getElementById("home-search-input");
+          const searchButton = searchForm ? searchForm.querySelector("button") : null;
+          const runSearch = (event) => {
+            if (event) event.preventDefault();
+            const query = (searchInput.value || "").trim();
+            if (!query) return;
+            const url = "https://www.google.com/search?q=" + encodeURIComponent(query);
+            title.textContent = "Search: " + query;
+            catalog.hidden = true;
+            player.classList.add("active");
+            player.setAttribute("aria-hidden", "false");
+            frame.go(url);
+          };
+          if (searchForm) searchForm.addEventListener("submit", runSearch);
+          if (searchButton) searchButton.addEventListener("click", runSearch);
+          if (searchInput) searchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") runSearch(event);
+          });
+        } catch (error) {
+          console.error("Scramjet browser could not start:", error);
+        }
+      })();
     </script>
   </body>
 </html>
