@@ -380,8 +380,10 @@
       }
 
       .settings-dialog {
-        width: min(440px, calc(100vw - 32px));
-        padding: 26px;
+        width: min(760px, calc(100vw - 32px));
+        max-height: min(90vh, 760px);
+        overflow-y: auto;
+        padding: 0;
         border: 1px solid rgba(173, 235, 255, 0.56);
         border-radius: 20px;
         background:
@@ -1160,6 +1162,7 @@
         }
       }
     </style>
+    <link rel="stylesheet" href="Effects/frostz-themes.css" />
   </head>
   <body>
     <video
@@ -1254,11 +1257,31 @@
         </button>
       </aside>
       <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
-        <h2 id="settings-title">Settings</h2>
-        <p>This settings panel is ready. Choose which settings you want to add here.</p>
-        <form method="dialog">
-          <button class="settings-dialog-close" type="submit">Close</button>
-        </form>
+        <div class="settings-layout">
+          <nav class="settings-nav" aria-label="Settings categories">
+            <button class="settings-nav-item" type="button" aria-current="page">
+              <svg class="settings-nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3.25a8.75 8.75 0 1 0 0 17.5h1.08a2.1 2.1 0 0 0 1.55-3.52 1.35 1.35 0 0 1 1-2.27h1.12a4 4 0 0 0 4-4c0-4.26-4.02-7.71-8.75-7.71Z" />
+                <circle cx="7.5" cy="11.5" r="1" />
+                <circle cx="10.5" cy="7.5" r="1" />
+                <circle cx="15" cy="7.75" r="1" />
+              </svg>
+              <span>Appearance</span>
+            </button>
+          </nav>
+          <div class="settings-main">
+            <h2 id="settings-title">Settings</h2>
+            <p>Choose an accent color for FrostZ. Your selection is saved on this device.</p>
+            <section class="theme-settings" aria-labelledby="theme-settings-title">
+              <h3 id="theme-settings-title">Themes</h3>
+              <div id="theme-options" class="theme-options" role="group" aria-label="Theme colors"></div>
+              <p id="theme-status" class="theme-status" role="status" aria-live="polite"></p>
+            </section>
+            <form method="dialog">
+              <button class="settings-dialog-close" type="submit">Close</button>
+            </form>
+          </div>
+        </div>
       </dialog>
       <div class="home-content">
         <div class="brand-lockup">
@@ -1268,7 +1291,11 @@
           <p id="brand-tagline" class="brand-tagline" aria-live="polite"></p>
         </div>
         <section class="home-dashboard" aria-label="FrostZ home dashboard">
-          <form class="home-search" role="search" aria-label="Browser search">
+          <form
+            class="home-search"
+            role="search"
+            aria-label="Browser search"
+          >
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <circle cx="10.8" cy="10.8" r="6.8" fill="none" stroke="currentColor" stroke-width="1.8" />
               <path d="m16 16 4.3 4.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
@@ -1532,7 +1559,6 @@
       }
       document.getElementById("creator-enter").addEventListener("click", enterFrostZ);
       document.getElementById("creator-close").addEventListener("click", enterFrostZ);
-
       const brandTagline = document.getElementById("brand-tagline");
       const searchPlaceholder = document.getElementById("home-search-input");
       const searchPhrases = [
@@ -1623,6 +1649,88 @@
       const libraryStatus = document.getElementById("library-status");
       const homeSidebar = document.getElementById("home-sidebar");
       const settingsDialog = document.getElementById("settings-dialog");
+      const themeOptions = document.getElementById("theme-options");
+      const themeStatus = document.getElementById("theme-status");
+      const themeStorageKey = "frostz-theme";
+      const themes = [
+        { id: "ice", name: "Ice blue", color: "#74d8f6" },
+        { id: "ocean", name: "Ocean", color: "#2584c8" },
+        { id: "sapphire", name: "Sapphire", color: "#3156d8" },
+        { id: "indigo", name: "Indigo", color: "#5645c8" },
+        { id: "violet", name: "Violet", color: "#8452d6" },
+        { id: "purple", name: "Purple", color: "#a347c5" },
+        { id: "magenta", name: "Magenta", color: "#d342a2" },
+        { id: "rose", name: "Rose", color: "#d64b83" },
+        { id: "red", name: "Red", color: "#db4d54" },
+        { id: "coral", name: "Coral", color: "#e86c55" },
+        { id: "orange", name: "Orange", color: "#ed8a38" },
+        { id: "amber", name: "Amber", color: "#dcaa31" },
+        { id: "gold", name: "Gold", color: "#c5b83d" },
+        { id: "lime", name: "Lime", color: "#90b840" },
+        { id: "green", name: "Green", color: "#44a76b" },
+        { id: "emerald", name: "Emerald", color: "#31a995" },
+        { id: "teal", name: "Teal", color: "#249d9c" }
+      ];
+      function applyTheme(theme, save = false) {
+        document.documentElement.style.setProperty("--theme-accent", theme.color);
+        document.documentElement.dataset.frostzTheme = theme.id;
+        themeOptions.querySelectorAll("button[data-theme-id]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.themeId === theme.id));
+        });
+        if (save) {
+          try {
+            localStorage.setItem(
+              themeStorageKey,
+              JSON.stringify({ id: theme.id, color: theme.color })
+            );
+            themeStatus.textContent = `${theme.name} theme selected.`;
+          } catch (error) {
+            console.error("Could not save the FrostZ theme.", error);
+            themeStatus.textContent = "Theme changed, but this browser could not save the selection.";
+          }
+        }
+      }
+      themes.forEach((theme) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "theme-option";
+        button.dataset.themeId = theme.id;
+        button.setAttribute("aria-label", `${theme.name} theme`);
+        button.setAttribute("aria-pressed", "false");
+        const swatch = document.createElement("span");
+        swatch.className = "theme-swatch";
+        swatch.setAttribute("aria-hidden", "true");
+        swatch.style.setProperty("--swatch-color", theme.color);
+        const label = document.createElement("span");
+        label.className = "theme-option-name";
+        label.textContent = theme.name;
+        button.append(swatch, label);
+        button.addEventListener("click", () => applyTheme(theme, true));
+        themeOptions.append(button);
+      });
+      try {
+        const savedTheme = JSON.parse(localStorage.getItem(themeStorageKey) || "null");
+        const matchingTheme = themes.find(
+          (theme) => theme.id === savedTheme?.id && theme.color === savedTheme?.color
+        );
+        applyTheme(matchingTheme || themes[0]);
+      } catch (error) {
+        console.error("Could not load the saved FrostZ theme.", error);
+        applyTheme(themes[0]);
+        themeStatus.textContent = "The saved theme could not be loaded; Ice blue is active.";
+      }
+      window.addEventListener("storage", (event) => {
+        if (event.key !== themeStorageKey || !event.newValue) return;
+        try {
+          const savedTheme = JSON.parse(event.newValue);
+          const matchingTheme = themes.find(
+            (theme) => theme.id === savedTheme?.id && theme.color === savedTheme?.color
+          );
+          if (matchingTheme) applyTheme(matchingTheme);
+        } catch (error) {
+          console.error("Could not apply a theme updated in another tab.", error);
+        }
+      });
       const gamesLayout = document.getElementById("games-layout");
       const sidebarToggle = document.getElementById("sidebar-toggle");
       const homeSidebarOpenButton = document.getElementById("home-sidebar-open-button");

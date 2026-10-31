@@ -118,6 +118,32 @@
 
         [x-cloak]{display:none !important}
     </style>
+    <link rel="stylesheet" href="../../Effects/frostz-themes.css" />
+    <script>
+        (() => {
+            const storageKey = "frostz-theme";
+            function applySavedTheme(value) {
+                if (!value) return;
+                try {
+                    const theme = JSON.parse(value);
+                    if (typeof theme.id !== "string" || !/^[a-z0-9-]+$/.test(theme.id) ||
+                        typeof theme.color !== "string" || !/^#[0-9a-f]{6}$/i.test(theme.color)) return;
+                    document.documentElement.style.setProperty("--theme-accent", theme.color);
+                    document.documentElement.dataset.frostzTheme = theme.id;
+                } catch (error) {
+                    console.error("Could not apply the saved FrostZ theme.", error);
+                }
+            }
+            try {
+                applySavedTheme(localStorage.getItem(storageKey));
+            } catch (error) {
+                console.error("Could not read the saved FrostZ theme.", error);
+            }
+            window.addEventListener("storage", (event) => {
+                if (event.key === storageKey) applySavedTheme(event.newValue);
+            });
+        })();
+    </script>
 </head>
 <body class="min-h-screen" x-data="app()" x-init="init()">
 

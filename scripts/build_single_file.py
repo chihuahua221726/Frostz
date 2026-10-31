@@ -42,17 +42,28 @@ def encode_text(value):
 
 def build():
     page = (ROOT / "index.html").read_text(encoding="utf-8")
-    stylesheet = (ROOT / "Effects" / "frostz-title.css").read_text(
+    title_stylesheet = (ROOT / "Effects" / "frostz-title.css").read_text(
         encoding="utf-8"
     )
     page, stylesheet_count = re.subn(
         r'<link rel="stylesheet" href="Effects/frostz-title\.css[^"]*" />',
-        lambda _: f"<style>\n{stylesheet}\n</style>",
+        lambda _: f"<style>\n{title_stylesheet}\n</style>",
         page,
         count=1,
     )
     if stylesheet_count != 1:
         raise ValueError("Could not find the FrostZ title stylesheet link in index.html")
+    theme_stylesheet = (ROOT / "Effects" / "frostz-themes.css").read_text(
+        encoding="utf-8"
+    )
+    page, theme_stylesheet_count = re.subn(
+        r'<link rel="stylesheet" href="Effects/frostz-themes\.css" />',
+        lambda _: f"<style>\n{theme_stylesheet}\n</style>",
+        page,
+        count=1,
+    )
+    if theme_stylesheet_count != 1:
+        raise ValueError("Could not find the FrostZ theme stylesheet link in index.html")
 
     asset_directory = ROOT / "Games" / "assets"
     for asset in sorted(asset_directory.iterdir()):
@@ -75,6 +86,14 @@ def build():
 
     movie_path = ROOT / "Games" / "Apps" / "Movie.html"
     movie = movie_path.read_text(encoding="utf-8")
+    movie, movie_stylesheet_count = re.subn(
+        r'<link rel="stylesheet" href="\.\./\.\./Effects/frostz-themes\.css" />',
+        lambda _: f"<style>\n{theme_stylesheet}\n</style>",
+        movie,
+        count=1,
+    )
+    if movie_stylesheet_count != 1:
+        raise ValueError("Could not find the theme stylesheet link in the Movies page")
     movie = movie.replace("../assets/home-icon.png", data_uri("Games/assets/home-icon.png"))
     movie = movie.replace("../../index.html", "#frostz-home")
     movie_script = """<script>
