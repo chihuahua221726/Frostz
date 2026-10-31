@@ -1937,31 +1937,54 @@
         if (event) event.preventDefault();
         const query = (searchInput && searchInput.value ? searchInput.value : "").trim();
         if (!query) return;
-        const url = "https://www.google.com/search?q=" + encodeURIComponent(query);
-        if (typeof title !== "undefined" && title) title.textContent = "Search: " + query;
+        const isUrl = /^[a-z][a-z0-9+.-]*:/i.test(query) || (query.includes(".") && !query.includes(" "));
+        const targetUrl = isUrl
+          ? (/^[a-z][a-z0-9+.-]*:/i.test(query) ? query : "https://" + query)
+          : "https://www.google.com/search?igu=1&q=" + encodeURIComponent(query);
+        if (typeof title !== "undefined" && title) title.textContent = isUrl ? targetUrl : "Search: " + query;
         if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
         if (typeof player !== "undefined" && player) {
           player.classList.add("active");
           player.setAttribute("aria-hidden", "false");
         }
+        // Use Scramjet (linked repo) for in-app browsing when available.
         if (scramjetFrame && typeof scramjetFrame.go === "function") {
-          scramjetFrame.go(url);
-        } else if (typeof frame !== "undefined" && frame) {
-          try { frame.src = url; } catch (e) { window.open(url, "_blank"); }
-        } else {
-          window.open(url, "_blank");
+          if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
+          if (typeof player !== "undefined" && player) {
+            player.classList.add("active");
+            player.setAttribute("aria-hidden", "false");
+          }
+          scramjetFrame.go(targetUrl);
+          return;
         }
+        // Google search works in-app via the igu=1 embed trick (no proxy needed).
+        if (!isUrl && typeof frame !== "undefined" && frame) {
+          if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
+          if (typeof player !== "undefined" && player) {
+            player.classList.add("active");
+            player.setAttribute("aria-hidden", "false");
+          }
+          frame.src = "https://www.google.com/search?igu=1&q=" + encodeURIComponent(query);
+          return;
+        }
+        // Other sites without a proxy: open in a new tab (no "refused to connect").
+        const opened = window.open(targetUrl, "_blank");
+        if (!opened) window.location.href = targetUrl;
       };
       if (searchForm) searchForm.addEventListener("submit", runSearch);
       if (searchButton) searchButton.addEventListener("click", runSearch);
       if (searchInput) searchInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter") runSearch(event);
       });
+      window.runFrostzSearch = runSearch;
+      if (searchButton) searchButton.setAttribute("onclick", "runFrostzSearch(event)");
+      if (searchForm) searchForm.setAttribute("onsubmit", "runFrostzSearch(event); return false;");
 
       (async () => {
         if (!("serviceWorker" in navigator)) return;
         try {
           const registration = await navigator.serviceWorker.register("/sw.js");
+          await navigator.serviceWorker.ready;
           const serviceworker = navigator.serviceWorker.controller || registration.active;
           const { Controller } = window.$scramjetController || {};
           const LibcurlClient = window.LibcurlClient || (window.$scramjetLibcurl && window.$scramjetLibcurl.LibcurlClient);
