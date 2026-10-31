@@ -1929,6 +1929,35 @@
       });
 
       // Scramjet-powered browser search
+      let scramjetFrame = null;
+      const searchForm = document.querySelector(".home-search");
+      const searchInput = document.getElementById("home-search-input");
+      const searchButton = searchForm ? searchForm.querySelector("button") : null;
+      const runSearch = (event) => {
+        if (event) event.preventDefault();
+        const query = (searchInput && searchInput.value ? searchInput.value : "").trim();
+        if (!query) return;
+        const url = "https://www.google.com/search?q=" + encodeURIComponent(query);
+        if (typeof title !== "undefined" && title) title.textContent = "Search: " + query;
+        if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
+        if (typeof player !== "undefined" && player) {
+          player.classList.add("active");
+          player.setAttribute("aria-hidden", "false");
+        }
+        if (scramjetFrame && typeof scramjetFrame.go === "function") {
+          scramjetFrame.go(url);
+        } else if (typeof frame !== "undefined" && frame) {
+          try { frame.src = url; } catch (e) { window.open(url, "_blank"); }
+        } else {
+          window.open(url, "_blank");
+        }
+      };
+      if (searchForm) searchForm.addEventListener("submit", runSearch);
+      if (searchButton) searchButton.addEventListener("click", runSearch);
+      if (searchInput) searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") runSearch(event);
+      });
+
       (async () => {
         if (!("serviceWorker" in navigator)) return;
         try {
@@ -1950,30 +1979,10 @@
           });
           await controller.wait();
           const browserFrame = document.getElementById("game-frame");
-          const frame = controller.createFrame(browserFrame, {
+          scramjetFrame = controller.createFrame(browserFrame, {
             plugins: utils
               ? [new utils.HttpCachePlugin(), new utils.UrlWatcherPlugin((url) => console.log(url)), new utils.CatchEscapedLinksPlugin((url) => new URL(location.href))]
               : [],
-          });
-
-          const searchForm = document.querySelector(".home-search");
-          const searchInput = document.getElementById("home-search-input");
-          const searchButton = searchForm ? searchForm.querySelector("button") : null;
-          const runSearch = (event) => {
-            if (event) event.preventDefault();
-            const query = (searchInput.value || "").trim();
-            if (!query) return;
-            const url = "https://www.google.com/search?q=" + encodeURIComponent(query);
-            title.textContent = "Search: " + query;
-            catalog.hidden = true;
-            player.classList.add("active");
-            player.setAttribute("aria-hidden", "false");
-            frame.go(url);
-          };
-          if (searchForm) searchForm.addEventListener("submit", runSearch);
-          if (searchButton) searchButton.addEventListener("click", runSearch);
-          if (searchInput) searchInput.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") runSearch(event);
           });
         } catch (error) {
           console.error("Scramjet browser could not start:", error);

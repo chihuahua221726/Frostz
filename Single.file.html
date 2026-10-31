@@ -2637,6 +2637,23 @@ select:focus,
         player.setAttribute("aria-hidden", "true");
         catalog.hidden = false;
       });
+
+      (function () {
+        var searchForm = document.querySelector(".home-search");
+        var searchInput = document.getElementById("home-search-input");
+        var searchButton = searchForm ? searchForm.querySelector("button") : null;
+        function runSearch(event) {
+          if (event) event.preventDefault();
+          var query = (searchInput && searchInput.value ? searchInput.value : "").trim();
+          if (!query) return;
+          window.open("https://www.google.com/search?q=" + encodeURIComponent(query), "_blank");
+        }
+        if (searchForm) searchForm.addEventListener("submit", runSearch);
+        if (searchButton) searchButton.addEventListener("click", runSearch);
+        if (searchInput) searchInput.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") runSearch(event);
+        });
+      })();
     </script>
   </body>
 </html>
