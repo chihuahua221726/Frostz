@@ -1172,6 +1172,19 @@
           animation: none;
         }
       }
+
+      .frostz-oneko {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 34px;
+        height: 34px;
+        background: url("Games/assets/oneko.png") -102px -102px / 272px 136px no-repeat;
+        image-rendering: pixelated;
+        z-index: 9999;
+        pointer-events: none;
+        transform: translate(0, 0);
+      }
     </style>
     <link rel="stylesheet" href="Effects/frostz-themes.css" />
     <script src="/scram/scramjet.js"></script>
@@ -1601,6 +1614,22 @@
             <span>Click to play</span>
           </span>
         </button>
+        <button
+          class="game-card"
+          type="button"
+          data-title="Oneko Neko"
+          data-src="Games/OnekoNeko.html"
+        >
+          <img
+            class="game-photo game-photo-contain"
+            src="Games/assets/oneko.png"
+            alt="Oneko Neko cat playground"
+          />
+          <span class="game-details">
+            <strong>Oneko Neko</strong>
+            <span>Click to play</span>
+          </span>
+        </button>
           </div>
           <h2 class="game-group-title">More Games</h2>
           <p id="library-status" role="status" aria-live="polite">
@@ -1974,6 +2003,7 @@
           backgroundStatus.textContent = "Preference changed for this session, but could not be saved.";
         }
       });
+
       const gamesLayout = document.getElementById("games-layout");
       const sidebarToggle = document.getElementById("sidebar-toggle");
       const homeSidebarOpenButton = document.getElementById("home-sidebar-open-button");
@@ -2255,6 +2285,81 @@
         } catch (error) {
           console.error("Scramjet browser could not start:", error);
         }
+      })();
+    </script>
+    <script>
+      (() => {
+        const catSize = 34;
+        const catCenter = catSize / 2;
+        const frames = {
+          idle: [[3, 3]],
+          E: [[3, 0], [3, 1]],
+          W: [[4, 2], [4, 3]],
+          N: [[1, 2], [1, 3]],
+          S: [[6, 3], [7, 2]],
+          NE: [[0, 2], [0, 3]],
+          NW: [[1, 0], [1, 1]],
+          SE: [[5, 1], [5, 2]],
+          SW: [[5, 3], [6, 1]],
+        };
+        const cat = document.createElement("div");
+        cat.className = "frostz-oneko";
+        document.body.appendChild(cat);
+        let x = window.innerWidth - 100;
+        let y = window.innerHeight - 100;
+        let target = null;
+        let last = 0;
+        let elapsed = 0;
+        let stepClock = 0;
+        let runFrame = 0;
+        const strideSeconds = 0.105;
+        const stridePixels = 6;
+        const clamp = (v, min, max) => Math.min(Math.max(min, max), Math.max(min, v));
+        function sprite(name, tick = 0) {
+          const list = frames[name];
+          const [col, row] = list[Math.floor(tick) % list.length];
+          cat.style.backgroundPosition = `${-col * catSize}px ${-row * catSize}px`;
+        }
+        function paint() {
+          x = clamp(x, 0, window.innerWidth - catSize);
+          y = clamp(y, 0, window.innerHeight - catSize);
+          cat.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+        }
+        function loop(time) {
+          if (!last) last = time;
+          const delta = Math.min((time - last) / 1000, 0.06);
+          last = time;
+          elapsed += delta;
+          const goal = target || { x, y };
+          stepClock += delta;
+          if (stepClock >= strideSeconds) {
+            stepClock %= strideSeconds;
+            const goalX = clamp(goal.x, 0, window.innerWidth - catSize);
+            const goalY = clamp(goal.y, 0, window.innerHeight - catSize);
+            const dx = goalX - x;
+            const dy = goalY - y;
+            const distance = Math.hypot(dx, dy);
+            if (distance > 6) {
+              const step = Math.min(stridePixels, distance - 4);
+              x += (dx / distance) * step;
+              y += (dy / distance) * step;
+              const horizontal = Math.abs(dx) > distance * 0.38 ? (dx > 0 ? "E" : "W") : "";
+              const vertical = Math.abs(dy) > distance * 0.38 ? (dy > 0 ? "S" : "N") : "";
+              sprite(vertical + horizontal || "idle", ++runFrame);
+              paint();
+            } else {
+              sprite("idle");
+            }
+          }
+          requestAnimationFrame(loop);
+        }
+        window.addEventListener("mousemove", (e) => {
+          target = { x: e.clientX - catCenter, y: e.clientY - catCenter };
+        });
+        window.addEventListener("mouseleave", () => { target = null; });
+        paint();
+        sprite("idle");
+        requestAnimationFrame(loop);
       })();
     </script>
   </body>
