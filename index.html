@@ -637,6 +637,12 @@
         stroke-width: 1.8;
       }
 
+      .shortcut-icon img {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+      }
+
       .home-shortcut:hover .shortcut-icon,
       .home-shortcut:focus-visible .shortcut-icon {
         transform: translateY(-3px);
@@ -1100,6 +1106,11 @@
           height: 24px;
         }
 
+        .shortcut-icon img {
+          width: 32px;
+          height: 32px;
+        }
+
         .home-shortcut-label {
           font-size: 0.76rem;
         }
@@ -1238,18 +1249,13 @@
           >
             <span class="launcher-icon" aria-hidden="true">
               <svg class="launcher-icon-svg" viewBox="0 0 32 32" fill="none">
-                <defs>
-                  <linearGradient id="movie-ice" x1="5" y1="6" x2="27" y2="28" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#f0fdff" />
-                    <stop offset=".48" stop-color="#8ce5ff" />
-                    <stop offset="1" stop-color="#43a9d8" />
-                  </linearGradient>
-                </defs>
-                <path d="M5 12.5h22v14H5z" fill="url(#movie-ice)" fill-opacity=".2" stroke="url(#movie-ice)" stroke-width="1.8" stroke-linejoin="round" />
-                <path d="m6.2 10.1 1-5.3 20.6 3.9-1 5.3L6.2 10.1Z" fill="url(#movie-ice)" fill-opacity=".27" stroke="url(#movie-ice)" stroke-width="1.8" stroke-linejoin="round" />
-                <path d="m11 5.9 3.1 5.4M18.5 7.3l3.1 5.4" stroke="#e9fbff" stroke-opacity=".9" stroke-width="1.6" stroke-linecap="round" />
-                <path d="M10 18h12M10 22h7" stroke="#dff9ff" stroke-width="1.5" stroke-linecap="round" />
-                <path d="M25.5 19.5v5m-2.5-2.5h5m-4.27-1.77 3.54 3.54m0-3.54-3.54 3.54" stroke="#f3feff" stroke-width="1.05" stroke-linecap="round" />
+                <path d="M5 12h22v14.5a1.5 1.5 0 0 1-1.5 1.5h-19A1.5 1.5 0 0 1 5 26.5V12Z" fill="#42b6f4" />
+                <path d="M6.5 5.4 27 2.5l.8 5.8L7.3 11.2 6.5 5.4Z" fill="#42b6f4" />
+                <path d="m10 4.9 3.7-.5 3.7 5.8-3.7.5L10 4.9Zm8.2-1.2 3.7-.5 3.7 5.8-3.7.5-3.7-5.8Z" fill="#71e0e5" />
+                <path d="M5 12h22v3H5z" fill="#42b6f4" />
+                <path d="m8 13 2.1-3.5h2.7L10.7 13h5.1l2.1-3.5h2.7L18.5 13h5.1l2.1-3.5h1.3V15H5v-2h3Z" fill="#71e0e5" />
+                <circle cx="7.4" cy="6.8" r="1.05" stroke="#e9fbff" stroke-width=".7" />
+                <path d="M6.5 18h19M6.5 22h19M13 25v-3m6 3v-3" stroke="#e9fbff" stroke-width=".65" />
               </svg>
             </span>
             <span class="launcher-label">Movies</span>
@@ -1263,7 +1269,7 @@
       <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="settings-title">
         <div class="settings-layout">
           <nav class="settings-nav" aria-label="Settings categories">
-            <button class="settings-nav-item" type="button" aria-current="page">
+            <button class="settings-nav-item" type="button" aria-current="page" aria-controls="settings-appearance" data-settings-page="appearance">
               <svg class="settings-nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
                 <path d="M12 3.25a8.75 8.75 0 1 0 0 17.5h1.08a2.1 2.1 0 0 0 1.55-3.52 1.35 1.35 0 0 1 1-2.27h1.12a4 4 0 0 0 4-4c0-4.26-4.02-7.71-8.75-7.71Z" />
                 <circle cx="7.5" cy="11.5" r="1" />
@@ -1272,14 +1278,85 @@
               </svg>
               <span>Appearance</span>
             </button>
+            <button class="settings-nav-item" type="button" aria-controls="settings-search" data-settings-page="search">
+              <svg class="settings-nav-icon settings-search-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                <circle cx="10.8" cy="10.8" r="6.8" />
+                <path d="m16 16 4.3 4.3" />
+              </svg>
+              <span>Search</span>
+            </button>
+            <button class="settings-nav-item" type="button" aria-controls="settings-privacy" data-settings-page="privacy">
+              <svg class="settings-nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3 19 6v5c0 4.5-2.9 8-7 10-4.1-2-7-5.5-7-10V6l7-3Z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <span>Privacy &amp; data</span>
+            </button>
+            <button class="settings-nav-item" type="button" aria-controls="settings-background" data-settings-page="background">
+              <svg class="settings-nav-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                <path d="M4 17.5 9.5 12l3.5 3.5 3-3 4 5H4Z" />
+                <circle cx="8" cy="7.5" r="1.5" />
+                <path d="M3 4h18v16H3z" />
+              </svg>
+              <span>Background</span>
+            </button>
           </nav>
           <div class="settings-main">
             <h2 id="settings-title">Settings</h2>
-            <p>Choose an accent color for FrostZ. Your selection is saved on this device.</p>
-            <section class="theme-settings" aria-labelledby="theme-settings-title">
-              <h3 id="theme-settings-title">Themes</h3>
-              <div id="theme-options" class="theme-options" role="group" aria-label="Theme colors"></div>
-              <p id="theme-status" class="theme-status" role="status" aria-live="polite"></p>
+            <section id="settings-appearance" class="settings-page" aria-labelledby="appearance-title">
+              <h3 id="appearance-title">Appearance</h3>
+              <p>Choose an accent color for FrostZ. Your selection is saved on this device.</p>
+              <div class="theme-settings" aria-labelledby="theme-settings-title">
+                <h4 id="theme-settings-title">Themes</h4>
+                <div id="theme-options" class="theme-options" role="group" aria-label="Theme colors"></div>
+                <p id="theme-status" class="theme-status" role="status" aria-live="polite"></p>
+              </div>
+            </section>
+            <section id="settings-search" class="settings-page" aria-labelledby="search-settings-title" hidden>
+              <h3 id="search-settings-title">Search</h3>
+              <p>Choose which search provider FrostZ uses for searches typed on the home page.</p>
+              <label class="settings-control" for="search-engine">
+                <span>
+                  <strong>Search engine</strong>
+                  <small>Your choice is saved on this device.</small>
+                </span>
+                <select id="search-engine" class="settings-select">
+                  <option value="google">Google</option>
+                  <option value="duckduckgo">DuckDuckGo</option>
+                  <option value="bing">Bing</option>
+                </select>
+              </label>
+              <p id="search-engine-status" class="settings-status" role="status" aria-live="polite"></p>
+            </section>
+            <section id="settings-privacy" class="settings-page" aria-labelledby="privacy-settings-title" hidden>
+              <h3 id="privacy-settings-title">Privacy &amp; data</h3>
+              <p>Search history stays in this browser on this device. It is off by default.</p>
+              <label class="settings-control settings-toggle" for="history-enabled">
+                <span>
+                  <strong>Save local search history</strong>
+                  <small>Keep recent searches in this browser while enabled.</small>
+                </span>
+                <input id="history-enabled" type="checkbox" />
+              </label>
+              <div class="history-controls">
+                <h4>Recent searches</h4>
+                <button id="clear-search-history" class="settings-secondary-button" type="button">Clear history</button>
+              </div>
+              <p id="history-empty" class="settings-hint">No saved searches.</p>
+              <ol id="search-history" class="search-history" aria-label="Recent searches"></ol>
+              <p id="history-status" class="settings-status" role="status" aria-live="polite"></p>
+            </section>
+            <section id="settings-background" class="settings-page" aria-labelledby="background-settings-title" hidden>
+              <h3 id="background-settings-title">Background</h3>
+              <p>Control the animated background video. Your preference is saved on this device.</p>
+              <label class="settings-control settings-toggle" for="background-video-enabled">
+                <span>
+                  <strong>Play background video</strong>
+                  <small>The background remains paused when your device requests reduced motion.</small>
+                </span>
+                <input id="background-video-enabled" type="checkbox" />
+              </label>
+              <p id="background-status" class="settings-status" role="status" aria-live="polite"></p>
             </section>
             <form method="dialog">
               <button class="settings-dialog-close" type="submit">Close</button>
@@ -1315,13 +1392,21 @@
           <nav class="home-shortcuts" aria-label="Apps">
             <button class="home-shortcut" id="shortcut-games" type="button">
               <span class="shortcut-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M7.5 7h9a4 4 0 0 1 3.8 2.8l1.1 3.5a2.5 2.5 0 0 1-4.1 2.6l-2.1-1.8H8.8l-2.1 1.8a2.5 2.5 0 0 1-4.1-2.6l1.1-3.5A4 4 0 0 1 7.5 7Z"/><path d="M7 10v4m-2-2h4m7-1h.01M18 13h.01"/></svg>
+                <img src="Games/assets/games-icon.png" alt="" />
               </span>
               <span class="home-shortcut-label">Games</span>
             </button>
             <a class="home-shortcut" href="Games/Apps/Movie.html">
               <span class="shortcut-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M4 8.5h16v11H4z"/><path d="m4.5 7.5 1-4 14 3-1 4z"/><path d="m8 4 2 4m4-3 2 4m-8 4h8m-8 3h5"/></svg>
+                <svg viewBox="0 0 32 32" fill="none">
+                  <path d="M5 12h22v14.5a1.5 1.5 0 0 1-1.5 1.5h-19A1.5 1.5 0 0 1 5 26.5V12Z" fill="#42b6f4" />
+                  <path d="M6.5 5.4 27 2.5l.8 5.8L7.3 11.2 6.5 5.4Z" fill="#42b6f4" />
+                  <path d="m10 4.9 3.7-.5 3.7 5.8-3.7.5L10 4.9Zm8.2-1.2 3.7-.5 3.7 5.8-3.7.5-3.7-5.8Z" fill="#71e0e5" />
+                  <path d="M5 12h22v3H5z" fill="#42b6f4" />
+                  <path d="m8 13 2.1-3.5h2.7L10.7 13h5.1l2.1-3.5h2.7L18.5 13h5.1l2.1-3.5h1.3V15H5v-2h3Z" fill="#71e0e5" />
+                  <circle cx="7.4" cy="6.8" r="1.05" stroke="#e9fbff" stroke-width=".7" />
+                  <path d="M6.5 18h19M6.5 22h19M13 25v-3m6 3v-3" stroke="#e9fbff" stroke-width=".65" />
+                </svg>
               </span>
               <span class="home-shortcut-label">Movies</span>
             </a>
@@ -1538,9 +1623,20 @@
       const frostzTitle = document.getElementById("frostz-title");
       const ambientBackground = document.getElementById("ambient-background");
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const backgroundVideoStorageKey = "frostz-background-video-enabled";
+      let backgroundVideoEnabled = true;
+      try {
+        const savedBackgroundVideo = localStorage.getItem(backgroundVideoStorageKey);
+        if (savedBackgroundVideo !== null) {
+          backgroundVideoEnabled = savedBackgroundVideo === "true";
+        }
+      } catch (error) {
+        console.error("Could not load the background video preference.", error);
+      }
 
       function syncBackgroundMotion() {
-        if (reducedMotion.matches) {
+        ambientBackground.hidden = !backgroundVideoEnabled;
+        if (!backgroundVideoEnabled || reducedMotion.matches) {
           ambientBackground.pause();
           return;
         }
@@ -1656,6 +1752,9 @@
       const themeOptions = document.getElementById("theme-options");
       const themeStatus = document.getElementById("theme-status");
       const themeStorageKey = "frostz-theme";
+      const searchEngineStorageKey = "frostz-search-engine";
+      const searchHistoryEnabledStorageKey = "frostz-search-history-enabled";
+      const searchHistoryStorageKey = "frostz-search-history";
       const themes = [
         { id: "ice", name: "Ice blue", color: "#74d8f6" },
         { id: "ocean", name: "Ocean", color: "#2584c8" },
@@ -1733,6 +1832,139 @@
           if (matchingTheme) applyTheme(matchingTheme);
         } catch (error) {
           console.error("Could not apply a theme updated in another tab.", error);
+        }
+      });
+      const settingsNavItems = document.querySelectorAll(".settings-nav-item[data-settings-page]");
+      const settingsPages = document.querySelectorAll(".settings-page");
+      settingsNavItems.forEach((button) => {
+        button.addEventListener("click", () => {
+          const pageId = button.getAttribute("aria-controls");
+          settingsNavItems.forEach((item) => {
+            if (item === button) item.setAttribute("aria-current", "page");
+            else item.removeAttribute("aria-current");
+          });
+          settingsPages.forEach((page) => {
+            page.hidden = page.id !== pageId;
+          });
+        });
+      });
+
+      const searchEngineSelect = document.getElementById("search-engine");
+      const searchEngineStatus = document.getElementById("search-engine-status");
+      const supportedSearchEngines = ["google", "duckduckgo", "bing"];
+      let selectedSearchEngine = "google";
+      try {
+        const savedSearchEngine = localStorage.getItem(searchEngineStorageKey);
+        if (supportedSearchEngines.includes(savedSearchEngine)) {
+          selectedSearchEngine = savedSearchEngine;
+        }
+      } catch (error) {
+        console.error("Could not load the saved search engine.", error);
+        searchEngineStatus.textContent = "The saved search engine could not be loaded; Google is active.";
+      }
+      searchEngineSelect.value = selectedSearchEngine;
+      searchEngineSelect.addEventListener("change", () => {
+        if (!supportedSearchEngines.includes(searchEngineSelect.value)) return;
+        selectedSearchEngine = searchEngineSelect.value;
+        try {
+          localStorage.setItem(searchEngineStorageKey, selectedSearchEngine);
+          searchEngineStatus.textContent = "Search engine preference saved.";
+        } catch (error) {
+          console.error("Could not save the search engine preference.", error);
+          searchEngineStatus.textContent = "Search engine changed for this session, but could not be saved.";
+        }
+      });
+
+      const historyEnabledInput = document.getElementById("history-enabled");
+      const historyStatus = document.getElementById("history-status");
+      const historyEmpty = document.getElementById("history-empty");
+      const searchHistoryList = document.getElementById("search-history");
+      let searchHistoryEnabled = false;
+      let searchHistory = [];
+      try {
+        searchHistoryEnabled = localStorage.getItem(searchHistoryEnabledStorageKey) === "true";
+        const savedSearchHistory = JSON.parse(localStorage.getItem(searchHistoryStorageKey) || "[]");
+        if (Array.isArray(savedSearchHistory)) {
+          searchHistory = savedSearchHistory.filter(
+            (entry) => typeof entry === "string" && entry.trim()
+          ).slice(0, 20);
+        }
+      } catch (error) {
+        console.error("Could not load the saved search history.", error);
+        historyStatus.textContent = "Saved search history could not be loaded.";
+      }
+      historyEnabledInput.checked = searchHistoryEnabled;
+      function renderSearchHistory() {
+        searchHistoryList.replaceChildren();
+        searchHistory.forEach((entry) => {
+          const item = document.createElement("li");
+          item.textContent = entry;
+          searchHistoryList.append(item);
+        });
+        historyEmpty.hidden = searchHistory.length > 0;
+        if (!searchHistory.length && !searchHistoryEnabled) {
+          historyEmpty.textContent = "No saved searches. Turn on local history to save future searches.";
+        } else if (!searchHistory.length) {
+          historyEmpty.textContent = "No saved searches yet.";
+        }
+      }
+      function saveSearchHistory(query) {
+        if (!searchHistoryEnabled) return;
+        searchHistory = [query, ...searchHistory.filter((entry) => entry !== query)].slice(0, 20);
+        renderSearchHistory();
+        try {
+          localStorage.setItem(searchHistoryStorageKey, JSON.stringify(searchHistory));
+          historyStatus.textContent = "Search saved in this browser.";
+        } catch (error) {
+          console.error("Could not save the local search history.", error);
+          historyStatus.textContent = "Search history could not be saved in this browser.";
+        }
+      }
+      renderSearchHistory();
+      historyEnabledInput.addEventListener("change", () => {
+        searchHistoryEnabled = historyEnabledInput.checked;
+        renderSearchHistory();
+        try {
+          localStorage.setItem(searchHistoryEnabledStorageKey, String(searchHistoryEnabled));
+          historyStatus.textContent = searchHistoryEnabled
+            ? "Local search history enabled. Existing saved searches were kept."
+            : "Local search history disabled. Existing saved searches were kept.";
+        } catch (error) {
+          console.error("Could not save the search history preference.", error);
+          historyStatus.textContent = "Preference changed for this session, but could not be saved.";
+        }
+      });
+      document.getElementById("clear-search-history").addEventListener("click", () => {
+        if (!searchHistory.length) {
+          historyStatus.textContent = "There is no saved search history to clear.";
+          return;
+        }
+        if (!window.confirm("Clear all locally saved FrostZ searches on this device?")) return;
+        searchHistory = [];
+        renderSearchHistory();
+        try {
+          localStorage.removeItem(searchHistoryStorageKey);
+          historyStatus.textContent = "Local search history cleared.";
+        } catch (error) {
+          console.error("Could not clear the local search history.", error);
+          historyStatus.textContent = "History cleared for this session, but could not be removed from storage.";
+        }
+      });
+
+      const backgroundVideoInput = document.getElementById("background-video-enabled");
+      const backgroundStatus = document.getElementById("background-status");
+      backgroundVideoInput.checked = backgroundVideoEnabled;
+      backgroundVideoInput.addEventListener("change", () => {
+        backgroundVideoEnabled = backgroundVideoInput.checked;
+        syncBackgroundMotion();
+        try {
+          localStorage.setItem(backgroundVideoStorageKey, String(backgroundVideoEnabled));
+          backgroundStatus.textContent = backgroundVideoEnabled
+            ? "Background video enabled."
+            : "Background video paused.";
+        } catch (error) {
+          console.error("Could not save the background video preference.", error);
+          backgroundStatus.textContent = "Preference changed for this session, but could not be saved.";
         }
       });
       const gamesLayout = document.getElementById("games-layout");
@@ -1938,9 +2170,15 @@
         const query = (searchInput && searchInput.value ? searchInput.value : "").trim();
         if (!query) return;
         const isUrl = /^[a-z][a-z0-9+.-]*:/i.test(query) || (query.includes(".") && !query.includes(" "));
+        const searchUrls = {
+          google: "https://www.google.com/search?igu=1&q=",
+          duckduckgo: "https://duckduckgo.com/?q=",
+          bing: "https://www.bing.com/search?q=",
+        };
         const targetUrl = isUrl
           ? (/^[a-z][a-z0-9+.-]*:/i.test(query) ? query : "https://" + query)
-          : "https://www.google.com/search?igu=1&q=" + encodeURIComponent(query);
+          : searchUrls[selectedSearchEngine] + encodeURIComponent(query);
+        if (!isUrl) saveSearchHistory(query);
         if (typeof title !== "undefined" && title) title.textContent = isUrl ? targetUrl : "Search: " + query;
         if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
         if (typeof player !== "undefined" && player) {
@@ -1957,14 +2195,14 @@
           scramjetFrame.go(targetUrl);
           return;
         }
-        // Google search works in-app via the igu=1 embed trick (no proxy needed).
-        if (!isUrl && typeof frame !== "undefined" && frame) {
+        // Google search can be embedded directly; other providers may block framing.
+        if (!isUrl && selectedSearchEngine === "google" && typeof frame !== "undefined" && frame) {
           if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
           if (typeof player !== "undefined" && player) {
             player.classList.add("active");
             player.setAttribute("aria-hidden", "false");
           }
-          frame.src = "https://www.google.com/search?igu=1&q=" + encodeURIComponent(query);
+          frame.src = targetUrl;
           return;
         }
         // Other sites without a proxy: open in a new tab (no "refused to connect").

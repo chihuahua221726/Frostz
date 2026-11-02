@@ -26,6 +26,98 @@
   );
 }
 
+.home-screen {
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.7));
+}
+
+.home-content {
+  position: relative;
+  z-index: 1;
+  align-content: center;
+  padding: clamp(24px, 5vw, 64px);
+}
+
+.brand-lockup {
+  gap: 10px;
+}
+
+.brand-tagline {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(0.82rem, 2vw, 1rem);
+  letter-spacing: 0.025em;
+}
+
+.home-dashboard {
+  width: min(680px, 100%);
+  gap: 26px;
+}
+
+.home-search {
+  min-height: 58px;
+  padding: 6px 7px 6px 20px;
+  border-color: rgba(255, 255, 255, 0.17);
+  border-radius: 999px;
+  background: rgba(5, 8, 12, 0.68);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3), inset 0 1px rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+}
+
+.home-search:focus-within {
+  border-color: color-mix(in srgb, var(--theme-accent) 72%, white);
+  box-shadow: 0 0 0 3px var(--theme-accent-wash), 0 16px 48px rgba(0, 0, 0, 0.34);
+}
+
+.home-search button {
+  width: 44px;
+  height: 44px;
+  flex-basis: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--theme-accent);
+  box-shadow: 0 0 22px var(--theme-accent-glow);
+  color: #07131b;
+}
+
+.home-search button:hover,
+.home-search button:focus-visible {
+  background: var(--theme-accent-light);
+  box-shadow: 0 0 26px var(--theme-accent-glow);
+}
+
+.shortcut-icon {
+  border-color: rgba(255, 255, 255, 0.16);
+  border-radius: 17px;
+  background: rgba(5, 8, 12, 0.52);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.07), 0 10px 26px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(12px);
+}
+
+.home-shortcut:hover .shortcut-icon,
+.home-shortcut:focus-visible .shortcut-icon {
+  border-color: var(--theme-accent);
+  background: color-mix(in srgb, var(--theme-accent) 18%, rgba(5, 8, 12, 0.72));
+  box-shadow: 0 0 24px var(--theme-accent-glow);
+}
+
+.home-clock {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.home-clock time:first-child {
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.home-clock time:last-child {
+  color: rgba(255, 255, 255, 0.78);
+}
+
 .home-sidebar {
   border-right-color: var(--theme-border);
   background:
@@ -222,6 +314,9 @@
   padding: 18px 12px;
   border-right: 1px solid var(--theme-border);
   background: color-mix(in srgb, var(--theme-deep) 82%, #06111b);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .settings-nav-item {
@@ -264,26 +359,49 @@
   stroke: none;
 }
 
+.settings-search-icon circle {
+  fill: none;
+  stroke: currentColor;
+}
+
+.settings-search-icon path {
+  stroke: currentColor;
+}
+
 .settings-main {
   min-width: 0;
   padding: 24px;
 }
 
-.settings-main > p {
-  margin-bottom: 20px;
+.settings-page[hidden] {
+  display: none;
+}
+
+.settings-page > h3 {
+  margin: 0 0 8px;
+  color: #f2fbff;
+  font-size: 1.15rem;
+}
+
+.settings-page > p {
+  margin: 0 0 20px;
+  color: #b6d2df;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .theme-settings {
   margin: 0 0 20px;
 }
 
-.theme-settings h3 {
+.theme-settings h4,
+.history-controls h4 {
   margin: 0 0 5px;
   color: #f2fbff;
   font-size: 1rem;
 }
 
-.theme-settings p {
+.theme-settings > p {
   margin: 0 0 12px;
   color: #b6d2df;
   font-size: 0.82rem;
@@ -294,6 +412,119 @@
   margin: 12px 0 0;
   color: #b6d2df;
   font-size: 0.82rem;
+}
+
+.settings-control {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--theme-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-deep) 72%, transparent);
+  color: #effaff;
+}
+
+.settings-control > span {
+  display: grid;
+  gap: 4px;
+}
+
+.settings-control strong {
+  font-size: 0.9rem;
+}
+
+.settings-control small {
+  color: #b6d2df;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.settings-select {
+  min-width: 150px;
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background: var(--theme-deep);
+  color: #effaff;
+  font: inherit;
+}
+
+.settings-select:focus-visible,
+.settings-secondary-button:focus-visible,
+.settings-toggle input:focus-visible {
+  outline: 2px solid var(--theme-accent-light);
+  outline-offset: 2px;
+}
+
+.settings-toggle input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  accent-color: var(--theme-accent);
+}
+
+.settings-status,
+.settings-hint {
+  min-height: 1em;
+  margin: 10px 0 0 !important;
+  color: #b6d2df !important;
+  font-size: 0.82rem !important;
+}
+
+.history-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.history-controls h4 {
+  margin: 0;
+}
+
+.settings-secondary-button {
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background: var(--theme-card);
+  color: #effaff;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.settings-secondary-button:hover {
+  border-color: var(--theme-accent);
+  background: var(--theme-accent-wash);
+}
+
+.search-history {
+  display: grid;
+  gap: 6px;
+  max-height: 180px;
+  overflow: auto;
+  margin: 10px 0 0;
+  padding-left: 26px;
+  color: #eaf8ff;
+  font-size: 0.84rem;
+}
+
+.search-history:empty,
+.settings-hint[hidden] {
+  display: none;
+}
+
+.search-history li {
+  overflow-wrap: anywhere;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--theme-deep) 68%, transparent);
 }
 
 .theme-options {
@@ -373,10 +604,13 @@
     padding: 10px 14px;
     border-right: 0;
     border-bottom: 1px solid var(--theme-border);
+    flex-direction: row;
+    flex-wrap: wrap;
   }
 
   .settings-nav-item {
     width: auto;
+    flex: 1 1 125px;
   }
 
   .settings-main {
@@ -439,4 +673,67 @@ select:focus,
 
 .player-exit {
   border-color: var(--theme-accent);
+}
+
+.home-screen:not([hidden]),
+.games-screen:not([hidden]),
+#player.active {
+  animation: frostz-surface-arrive 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.settings-dialog[open] {
+  animation: frostz-dialog-arrive 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.home-sidebar,
+.shortcut-icon,
+.games-launcher,
+.game-card,
+.settings-nav-item,
+.theme-option,
+.settings-dialog-close {
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes frostz-surface-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes frostz-dialog-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(7px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-screen:not([hidden]),
+  .games-screen:not([hidden]),
+  #player.active,
+  .settings-dialog[open] {
+    animation: none;
+  }
+
+  .home-sidebar,
+  .shortcut-icon,
+  .games-launcher,
+  .game-card,
+  .settings-nav-item,
+  .theme-option,
+  .settings-dialog-close {
+    transition-duration: 0.01ms;
+  }
 }
