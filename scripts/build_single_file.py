@@ -123,8 +123,10 @@ def build():
         raise ValueError("Could not find a unique body start tag in index.html")
 
     player_markup = """      <iframe id="game-frame" title="Game" allow="fullscreen"></iframe>
+      <iframe id="browser-frame" title="Browser tab" allow="fullscreen; autoplay; clipboard-read; clipboard-write" hidden></iframe>
     </section>"""
     movie_markup = """      <iframe id="game-frame" title="Game" allow="fullscreen"></iframe>
+      <iframe id="browser-frame" title="Browser tab" allow="fullscreen; autoplay; clipboard-read; clipboard-write" hidden></iframe>
     </section>
     <section id="bundle-movie-view" class="bundle-movie-view" hidden aria-label="Movies">
       <header class="bundle-movie-toolbar">

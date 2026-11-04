@@ -5,6 +5,8 @@ The games load their Unity WebGL builds from the CDN URLs in their HTML pages, s
 Game pages and cover images are stored in the `Games` folder.
 The catalog loads the additional game list and covers from published CDNs and serves its game pages from a raw HTML mirror, so an internet connection is required to browse those games.
 
+The homepage web search opens in FrostZ's tabbed browser view. Tabs can be opened, switched, and closed; browser navigation uses the configured Scramjet transport when available.
+
 `Single.file.html` is a downloadable, self-contained copy of the FrostZ app shell. It embeds the homepage styles, images, looping background video, local game pages, and Movies page in one HTML file. The game builds, remote game catalog, movie catalog, and streaming providers still require an internet connection.
 
 Whenever you update `index.html`, `Effects/frostz-title.css`, `Games/Apps/Movie.html`, a local game page, or a file under `Games/assets`, regenerate the downloadable bundle before finishing the change:

@@ -1071,6 +1071,30 @@
         border: 0;
       }
 
+      #browser-frame {
+        width: 100%;
+        min-height: 0;
+        flex: 1;
+        border: 0;
+      }
+
+      #browser-frame[hidden] {
+        display: none;
+      }
+
+      #player.browser-active #game-frame,
+      #player.browser-active #game-title {
+        display: none;
+      }
+
+      #player.browser-active .player-toolbar {
+        gap: 10px;
+      }
+
+      #player.browser-active #back-button {
+        flex: 0 0 auto;
+      }
+
       @media (max-width: 700px) {
         .home-sidebar-open-button {
           top: 14px;
@@ -1184,6 +1208,54 @@
         z-index: 9999;
         pointer-events: none;
         transform: translate(0, 0);
+        filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.3));
+        will-change: transform;
+      }
+
+      /* Sleek, clean, beautiful refinements */
+      .game-card {
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      }
+
+      .game-card:hover,
+      .game-card:focus-visible {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.34);
+      }
+
+      .game-card .game-photo {
+        transition: transform 260ms ease;
+      }
+
+      .game-card:hover .game-photo,
+      .game-card:focus-visible .game-photo {
+        transform: scale(1.05);
+      }
+
+      .home-shortcut .shortcut-icon {
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      }
+
+      .home-shortcut:hover .shortcut-icon,
+      .home-shortcut:focus-visible .shortcut-icon {
+        transform: translateY(-4px) scale(1.04);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+      }
+
+      .games-launcher {
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .games-launcher:hover,
+      .games-launcher:focus-visible {
+        transform: translateY(-2px);
+      }
+
+      .ambient-background {
+        filter: saturate(1.08) contrast(1.04);
       }
     </style>
     <link rel="stylesheet" href="Effects/frostz-themes.css" />
@@ -1647,12 +1719,22 @@
     </section>
 
     <section id="player" aria-label="Game player" aria-hidden="true">
+      <nav id="browser-tabbar" class="browser-tabbar" aria-label="Browser tabs" hidden>
+        <div id="browser-tabs" class="browser-tabs"></div>
+        <button id="browser-new-tab" class="browser-new-tab" type="button" aria-label="New tab" title="New tab">+</button>
+      </nav>
       <div class="player-toolbar">
         <button id="back-button" type="button">Back to games</button>
+        <form id="browser-address-form" class="browser-address-form" role="search" hidden>
+          <label class="sr-only" for="browser-address">Search or enter address</label>
+          <input id="browser-address" type="search" placeholder="Search or enter address" autocomplete="off" />
+          <button type="submit">Go</button>
+        </form>
         <strong id="game-title"></strong>
         <p id="game-status" role="status" aria-live="polite"></p>
       </div>
       <iframe id="game-frame" title="Game" allow="fullscreen"></iframe>
+      <iframe id="browser-frame" title="Browser tab" allow="fullscreen; autoplay; clipboard-read; clipboard-write" hidden></iframe>
     </section>
 
     <script>
@@ -1778,12 +1860,22 @@
       const catalog = document.getElementById("catalog");
       const player = document.getElementById("player");
       let frame = document.getElementById("game-frame");
+      const browserFrame = document.getElementById("browser-frame");
+      let scramjetFrame = null;
+      let browserMode = false;
+      let browserTabSequence = 0;
+      let browserTabs = [];
+      let activeBrowserTabId = null;
       const title = document.getElementById("game-title");
       const gameStatus = document.getElementById("game-status");
       const search = document.getElementById("game-search");
       const remoteGames = document.getElementById("remote-games");
       const libraryStatus = document.getElementById("library-status");
       const homeSidebar = document.getElementById("home-sidebar");
+      const browserTabbar = document.getElementById("browser-tabbar");
+      const browserTabsElement = document.getElementById("browser-tabs");
+      const browserAddressForm = document.getElementById("browser-address-form");
+      const browserAddressInput = document.getElementById("browser-address");
       const settingsDialog = document.getElementById("settings-dialog");
       const themeOptions = document.getElementById("theme-options");
       const themeStatus = document.getElementById("theme-status");
@@ -2052,7 +2144,7 @@
       });
 
       function goHome() {
-        frame.src = "about:blank";
+        if (!browserMode) frame.src = "about:blank";
         player.classList.remove("active");
         player.setAttribute("aria-hidden", "true");
         catalog.hidden = true;
@@ -2068,6 +2160,13 @@
       });
 
       function openGame(card) {
+        browserMode = false;
+        player.classList.remove("browser-active");
+        browserTabbar.hidden = true;
+        browserAddressForm.hidden = true;
+        browserFrame.hidden = true;
+        frame.hidden = false;
+        document.getElementById("back-button").textContent = "Back to games";
         title.textContent = card.dataset.title;
         catalog.hidden = true;
         player.classList.add("active");
@@ -2189,7 +2288,132 @@
 
       loadMoreGames();
 
+      function renderBrowserTabs() {
+        browserTabsElement.replaceChildren();
+        browserTabs.forEach((tab) => {
+          const item = document.createElement("div");
+          item.className = "browser-tab-item";
+          if (tab.id === activeBrowserTabId) item.classList.add("is-active");
+
+          const selectButton = document.createElement("button");
+          selectButton.className = "browser-tab-select";
+          selectButton.type = "button";
+          if (tab.id === activeBrowserTabId) selectButton.setAttribute("aria-current", "page");
+          selectButton.tabIndex = tab.id === activeBrowserTabId ? 0 : -1;
+          selectButton.textContent = tab.title;
+          selectButton.title = tab.title;
+          selectButton.addEventListener("click", () => {
+            activeBrowserTabId = tab.id;
+            renderBrowserTabs();
+            showBrowserTab(tab);
+          });
+
+          const closeButton = document.createElement("button");
+          closeButton.className = "browser-tab-close";
+          closeButton.type = "button";
+          closeButton.setAttribute("aria-label", `Close ${tab.title}`);
+          closeButton.textContent = "×";
+          closeButton.addEventListener("click", () => closeBrowserTab(tab.id));
+
+          item.append(selectButton, closeButton);
+          browserTabsElement.append(item);
+        });
+      }
+
+      function showBrowserView() {
+        browserMode = true;
+        homeScreen.hidden = true;
+        catalog.hidden = true;
+        player.classList.add("active", "browser-active");
+        player.setAttribute("aria-hidden", "false");
+        browserTabbar.hidden = false;
+        browserAddressForm.hidden = false;
+        browserFrame.hidden = false;
+        frame.hidden = true;
+        document.getElementById("back-button").textContent = "Home";
+      }
+
+      function showBrowserTab(tab) {
+        showBrowserView();
+        browserAddressInput.value = tab.url === "about:blank" ? "" : tab.url;
+        if (tab.url === "about:blank") {
+          browserFrame.src = "about:blank";
+          gameStatus.textContent = "";
+        } else if (tab.external && !scramjetFrame) {
+          browserFrame.src = "about:blank";
+          gameStatus.textContent = "This page was opened in a separate browser tab.";
+        } else if (scramjetFrame && typeof scramjetFrame.go === "function") {
+          gameStatus.textContent = "";
+          scramjetFrame.go(tab.url);
+        } else {
+          browserFrame.src = tab.url;
+          gameStatus.textContent = "";
+        }
+      }
+
+      function createBrowserTab() {
+        const tab = {
+          id: ++browserTabSequence,
+          title: "New tab",
+          url: "about:blank",
+          external: false,
+        };
+        browserTabs.push(tab);
+        activeBrowserTabId = tab.id;
+        renderBrowserTabs();
+        showBrowserTab(tab);
+        browserAddressInput.focus();
+        return tab;
+      }
+
+      function closeBrowserTab(tabId) {
+        const closingIndex = browserTabs.findIndex((tab) => tab.id === tabId);
+        if (closingIndex < 0) return;
+        const wasActive = activeBrowserTabId === tabId;
+        browserTabs.splice(closingIndex, 1);
+        if (!browserTabs.length) {
+          activeBrowserTabId = null;
+          browserMode = false;
+          browserTabbar.hidden = true;
+          browserAddressForm.hidden = true;
+          browserFrame.hidden = true;
+          browserFrame.src = "about:blank";
+          frame.hidden = false;
+          player.classList.remove("active", "browser-active");
+          player.setAttribute("aria-hidden", "true");
+          homeScreen.hidden = false;
+          searchInput.focus();
+          return;
+        }
+        if (wasActive) {
+          const nextTab = browserTabs[Math.min(closingIndex, browserTabs.length - 1)];
+          activeBrowserTabId = nextTab.id;
+        }
+        renderBrowserTabs();
+        if (wasActive) {
+          showBrowserTab(browserTabs.find((tab) => tab.id === activeBrowserTabId));
+        }
+      }
+
+      document.getElementById("browser-new-tab").addEventListener("click", createBrowserTab);
+      browserAddressForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        navigateBrowserQuery(browserAddressInput.value);
+      });
+
       document.getElementById("back-button").addEventListener("click", () => {
+        if (browserMode) {
+          browserMode = false;
+          player.classList.remove("active", "browser-active");
+          player.setAttribute("aria-hidden", "true");
+          browserTabbar.hidden = true;
+          browserAddressForm.hidden = true;
+          browserFrame.hidden = true;
+          frame.hidden = false;
+          homeScreen.hidden = false;
+          searchInput.focus();
+          return;
+        }
         frame.src = "about:blank";
         gameStatus.textContent = "";
         player.classList.remove("active");
@@ -2198,13 +2422,11 @@
       });
 
       // Scramjet-powered browser search
-      let scramjetFrame = null;
       const searchForm = document.querySelector(".home-search");
       const searchInput = document.getElementById("home-search-input");
       const searchButton = searchForm ? searchForm.querySelector("button") : null;
-      const runSearch = (event) => {
-        if (event) event.preventDefault();
-        const query = (searchInput && searchInput.value ? searchInput.value : "").trim();
+      function navigateBrowserQuery(rawQuery) {
+        const query = rawQuery.trim();
         if (!query) return;
         const isUrl = /^[a-z][a-z0-9+.-]*:/i.test(query) || (query.includes(".") && !query.includes(" "));
         const searchUrls = {
@@ -2216,35 +2438,39 @@
           ? (/^[a-z][a-z0-9+.-]*:/i.test(query) ? query : "https://" + query)
           : searchUrls[selectedSearchEngine] + encodeURIComponent(query);
         if (!isUrl) saveSearchHistory(query);
-        if (typeof title !== "undefined" && title) title.textContent = isUrl ? targetUrl : "Search: " + query;
-        if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
-        if (typeof player !== "undefined" && player) {
-          player.classList.add("active");
-          player.setAttribute("aria-hidden", "false");
-        }
-        // Use Scramjet (linked repo) for in-app browsing when available.
+        if (!activeBrowserTabId) createBrowserTab();
+        const tab = browserTabs.find((candidate) => candidate.id === activeBrowserTabId);
+        const tabTitle = isUrl ? targetUrl : query;
+        tab.title = tabTitle || "New tab";
+        tab.url = targetUrl;
+        tab.external = !scramjetFrame && (isUrl || selectedSearchEngine !== "google");
+        title.textContent = tab.title;
+        renderBrowserTabs();
+        showBrowserView();
         if (scramjetFrame && typeof scramjetFrame.go === "function") {
-          if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
-          if (typeof player !== "undefined" && player) {
-            player.classList.add("active");
-            player.setAttribute("aria-hidden", "false");
-          }
+          gameStatus.textContent = "";
+          browserAddressInput.value = targetUrl;
           scramjetFrame.go(targetUrl);
           return;
         }
-        // Google search can be embedded directly; other providers may block framing.
-        if (!isUrl && selectedSearchEngine === "google" && typeof frame !== "undefined" && frame) {
-          if (typeof catalog !== "undefined" && catalog) catalog.hidden = true;
-          if (typeof player !== "undefined" && player) {
-            player.classList.add("active");
-            player.setAttribute("aria-hidden", "false");
-          }
-          frame.src = targetUrl;
+        browserAddressInput.value = targetUrl;
+        if (!tab.external) {
+          browserFrame.src = targetUrl;
+          gameStatus.textContent = "";
           return;
         }
-        // Other sites without a proxy: open in a new tab (no "refused to connect").
         const opened = window.open(targetUrl, "_blank");
-        if (!opened) window.location.href = targetUrl;
+        if (!opened) {
+          browserMode = false;
+          window.location.href = targetUrl;
+          return;
+        }
+        browserFrame.src = "about:blank";
+        gameStatus.textContent = "This page was opened in a separate browser tab.";
+      }
+      const runSearch = (event) => {
+        if (event) event.preventDefault();
+        navigateBrowserQuery(searchInput.value);
       };
       if (searchForm) searchForm.addEventListener("submit", runSearch);
       if (searchButton) searchButton.addEventListener("click", runSearch);
@@ -2276,7 +2502,6 @@
             },
           });
           await controller.wait();
-          const browserFrame = document.getElementById("game-frame");
           scramjetFrame = controller.createFrame(browserFrame, {
             plugins: utils
               ? [new utils.HttpCachePlugin(), new utils.UrlWatcherPlugin((url) => console.log(url)), new utils.CatchEscapedLinksPlugin((url) => new URL(location.href))]
