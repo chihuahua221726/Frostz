@@ -2,6 +2,7 @@
 """Regenerate Single.file.html from FrostZ's canonical source files."""
 
 import base64
+import html
 import json
 import mimetypes
 import re
@@ -38,6 +39,24 @@ def data_uri(path):
 
 def encode_text(value):
     return base64.b64encode(value.encode("utf-8")).decode("ascii")
+
+
+def build_interactive_svg(page):
+    srcdoc = html.escape(page, quote=True).replace("\n", "&#10;").replace("\t", "&#9;")
+    svg = f"""<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="100%" height="100%" viewBox="0 0 1280 800" preserveAspectRatio="none" role="application" aria-labelledby="frostz-svg-title frostz-svg-description">
+  <title id="frostz-svg-title">FrostZ</title>
+  <desc id="frostz-svg-description">Interactive FrostZ site embedded in a scalable SVG.</desc>
+  <foreignObject x="0" y="0" width="1280" height="800">
+    <xhtml:iframe title="FrostZ interactive site" srcdoc="{srcdoc}" style="display:block;width:100%;height:100%;border:0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write"></xhtml:iframe>
+  </foreignObject>
+</svg>
+"""
+    output = ROOT / "FrostZ.svg"
+    temporary_output = output.with_suffix(output.suffix + ".tmp")
+    temporary_output.write_text(svg, encoding="utf-8", newline="\n")
+    temporary_output.replace(output)
+    print(f"Built {output.name}: {output.stat().st_size:,} bytes.")
 
 
 def build():
@@ -200,6 +219,7 @@ def build():
         f"Built {output.name}: {output.stat().st_size:,} bytes, "
         f"{len(game_paths)} local game pages, one Movies page."
     )
+    build_interactive_svg(page)
 
 
 if __name__ == "__main__":
