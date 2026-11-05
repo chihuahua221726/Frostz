@@ -2,6 +2,7 @@
 """Regenerate Single.file.html from FrostZ's canonical source files."""
 
 import base64
+import gzip
 import html
 import json
 import mimetypes
@@ -42,16 +43,30 @@ def encode_text(value):
 
 
 def build_interactive_svg(page):
-    srcdoc = html.escape(page, quote=True).replace("\n", "&#10;").replace("\t", "&#9;")
-    svg = f"""<?xml version="1.0" encoding="UTF-8"?>
+    compressed_page = gzip.compress(page.encode("utf-8"), compresslevel=9, mtime=0)
+    encoded_page = base64.b64encode(compressed_page).decode("ascii")
+    svg = """<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="100%" height="100%" viewBox="0 0 1280 800" preserveAspectRatio="none" role="application" aria-labelledby="frostz-svg-title frostz-svg-description">
   <title id="frostz-svg-title">FrostZ</title>
   <desc id="frostz-svg-description">Interactive FrostZ site embedded in a scalable SVG.</desc>
+  <metadata id="frostz-compressed-app">__FROSTZ_COMPRESSED_APP__</metadata>
   <foreignObject x="0" y="0" width="1280" height="800">
-    <xhtml:iframe title="FrostZ interactive site" srcdoc="{srcdoc}" style="display:block;width:100%;height:100%;border:0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write"></xhtml:iframe>
+    <xhtml:iframe id="frostz-app-frame" title="FrostZ interactive site" style="display:block;width:100%;height:100%;border:0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write"></xhtml:iframe>
   </foreignObject>
+  <script><![CDATA[
+    (async () => {
+      const encoded = document.getElementById("frostz-compressed-app").textContent.trim();
+      const binary = atob(encoded);
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+      const app = await new Response(stream).text();
+      document.getElementById("frostz-app-frame").setAttribute("srcdoc", app);
+    })().catch((error) => {
+      console.error("Could not load the embedded FrostZ app.", error);
+    });
+  ]]></script>
 </svg>
-"""
+""".replace("__FROSTZ_COMPRESSED_APP__", encoded_page)
     output = ROOT / "FrostZ.svg"
     temporary_output = output.with_suffix(output.suffix + ".tmp")
     temporary_output.write_text(svg, encoding="utf-8", newline="\n")
