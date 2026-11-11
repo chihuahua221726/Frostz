@@ -116,7 +116,14 @@ def build():
         source = ROOT / game_path
         if not source.is_file():
             raise FileNotFoundError(f"Local game page does not exist: {game_path}")
-        game_pages[game_path] = base64.b64encode(source.read_bytes()).decode("ascii")
+        game_page = source.read_text(encoding="utf-8")
+        game_page = game_page.replace(
+            "../Games/assets/oneko-thanksgiving.png",
+            data_uri("Games/assets/oneko-thanksgiving.png"),
+        )
+        game_pages[game_path] = base64.b64encode(game_page.encode("utf-8")).decode(
+            "ascii"
+        )
 
     movie_path = ROOT / "Games" / "Apps" / "Movie.html"
     movie = movie_path.read_text(encoding="utf-8")

@@ -447,6 +447,7 @@ svg {
   top: 70%;
   width: 34px;
   height: 34px;
+  background-image: url("../Games/assets/oneko-thanksgiving.png");
   background-size: 272px 136px;
   background-position: -102px -102px;
   z-index: 4;
@@ -498,6 +499,7 @@ svg {
   top: 6px;
   width: 34px;
   height: 34px;
+  background-image: url("../Games/assets/oneko-thanksgiving.png");
   background-size: 272px 136px;
   background-position: -68px 0;
   z-index: 1;
@@ -1737,7 +1739,10 @@ details p {
 .pet-bed .bed-cat:active {
   cursor: grabbing;
 }
-
+.demo-cat,
+.bed-cat {
+  overflow: visible;
+}
     </style>
   </head>
   <body>
@@ -2297,5 +2302,79 @@ details p {
 })();
 
     </script>
+    <script>
+      (() => {
+        const thanksgiving = document.createElement("div");
+        thanksgiving.id = "frostz-thanksgiving";
+        thanksgiving.setAttribute("aria-hidden", "true");
+        thanksgiving.innerHTML = '<div class="frostz-thanksgiving-badge">Happy Thanksgiving 🦃</div><div class="frostz-thanksgiving-leaves"></div>';
+        document.body.appendChild(thanksgiving);
+        const leaves = thanksgiving.querySelector(".frostz-thanksgiving-leaves");
+        const symbols = ["🍁", "🍂", "🍃", "🦃"];
+        function spawnLeaf() {
+          const leaf = document.createElement("span");
+          leaf.className = "frostz-thanksgiving-leaf";
+          leaf.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+          leaf.style.left = Math.random() * 100 + "vw";
+          leaf.style.animationDuration = 6 + Math.random() * 6 + "s";
+          leaf.style.fontSize = 14 + Math.random() * 18 + "px";
+          leaf.style.opacity = (0.5 + Math.random() * 0.4).toFixed(2);
+          leaves.appendChild(leaf);
+          leaf.addEventListener("animationend", () => leaf.remove());
+        }
+        setInterval(spawnLeaf, 900);
+        for (let i = 0; i < 8; i++) setTimeout(spawnLeaf, i * 300);
+      })();
+    </script>
+    <style>
+      #frostz-thanksgiving { position: fixed; inset: 0; pointer-events: none; z-index: 9998; overflow: hidden; }
+      .frostz-thanksgiving-badge { position: fixed; left: 16px; bottom: 16px; padding: 8px 14px; border-radius: 999px; background: linear-gradient(135deg, rgba(255, 140, 60, 0.92), rgba(180, 80, 30, 0.92)); color: #fff; font: 700 13px/1.2 Arial, sans-serif; letter-spacing: 0.02em; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); backdrop-filter: blur(6px); animation: frostz-thanksgiving-pop 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+      .frostz-thanksgiving-leaf { position: absolute; top: -40px; will-change: transform, opacity; animation: frostz-thanksgiving-fall linear forwards; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25)); }
+      @keyframes frostz-thanksgiving-fall { 0% { transform: translate3d(0, -40px, 0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate3d(40px, 110vh, 0) rotate(360deg); opacity: 0; } }
+      @keyframes frostz-thanksgiving-pop { 0% { transform: translateY(12px) scale(0.92); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+    </style>
+    <script>
+      (() => {
+        const corner = document.createElement("div");
+        corner.className = "frostz-thanksgiving-corner";
+        corner.setAttribute("aria-hidden", "true");
+        corner.innerHTML = '<span>🦃</span><span>🥧</span><span>🎃</span><span>🍂</span>';
+        document.body.appendChild(corner);
+      })();
+    </script>
+    <style>
+      .frostz-thanksgiving-corner {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        display: flex;
+        gap: 6px;
+        padding: 8px 10px;
+        border-radius: 14px;
+        background: rgba(20, 12, 6, 0.55);
+        backdrop-filter: blur(6px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+        pointer-events: none;
+        font-size: 20px;
+        line-height: 1;
+        animation: frostz-thanksgiving-corner 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      .frostz-thanksgiving-corner span {
+        display: inline-block;
+        animation: frostz-thanksgiving-bob 2.4s ease-in-out infinite;
+      }
+      .frostz-thanksgiving-corner span:nth-child(2) { animation-delay: 0.2s; }
+      .frostz-thanksgiving-corner span:nth-child(3) { animation-delay: 0.4s; }
+      .frostz-thanksgiving-corner span:nth-child(4) { animation-delay: 0.6s; }
+      @keyframes frostz-thanksgiving-corner {
+        0% { transform: translateY(14px) scale(0.85); opacity: 0; }
+        100% { transform: translateY(0) scale(1); opacity: 1; }
+      }
+      @keyframes frostz-thanksgiving-bob {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+      }
+    </style>
   </body>
 </html>
