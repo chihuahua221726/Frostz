@@ -1687,22 +1687,6 @@
             <span>Click to play</span>
           </span>
         </button>
-        <button
-          class="game-card"
-          type="button"
-          data-title="Oneko Neko"
-          data-src="Games/OnekoNeko.html"
-        >
-          <img
-            class="game-photo game-photo-contain"
-            src="Games/assets/oneko.png"
-            alt="Oneko Neko cat playground"
-          />
-          <span class="game-details">
-            <strong>Oneko Neko</strong>
-            <span>Click to play</span>
-          </span>
-        </button>
           </div>
           <h2 class="game-group-title">More Games</h2>
           <p id="library-status" role="status" aria-live="polite">
@@ -2340,9 +2324,6 @@
         if (tab.url === "about:blank") {
           browserFrame.src = "about:blank";
           gameStatus.textContent = "";
-        } else if (tab.external && !scramjetFrame) {
-          browserFrame.src = "about:blank";
-          gameStatus.textContent = "This page was opened in a separate browser tab.";
         } else if (scramjetFrame && typeof scramjetFrame.go === "function") {
           gameStatus.textContent = "";
           scramjetFrame.go(tab.url);
@@ -2357,7 +2338,6 @@
           id: ++browserTabSequence,
           title: "New tab",
           url: "about:blank",
-          external: false,
         };
         browserTabs.push(tab);
         activeBrowserTabId = tab.id;
@@ -2444,7 +2424,6 @@
         const tabTitle = isUrl ? targetUrl : query;
         tab.title = tabTitle || "New tab";
         tab.url = targetUrl;
-        tab.external = !scramjetFrame && (isUrl || selectedSearchEngine !== "google");
         title.textContent = tab.title;
         renderBrowserTabs();
         showBrowserView();
@@ -2455,19 +2434,8 @@
           return;
         }
         browserAddressInput.value = targetUrl;
-        if (!tab.external) {
-          browserFrame.src = targetUrl;
-          gameStatus.textContent = "";
-          return;
-        }
-        const opened = window.open(targetUrl, "_blank");
-        if (!opened) {
-          browserMode = false;
-          window.location.href = targetUrl;
-          return;
-        }
-        browserFrame.src = "about:blank";
-        gameStatus.textContent = "This page was opened in a separate browser tab.";
+        browserFrame.src = targetUrl;
+        gameStatus.textContent = "";
       }
       const runSearch = (event) => {
         if (event) event.preventDefault();
@@ -2580,10 +2548,10 @@
           }
           requestAnimationFrame(loop);
         }
-        window.addEventListener("mousemove", (e) => {
+        window.addEventListener("pointermove", (e) => {
           target = { x: e.clientX - catCenter, y: e.clientY - catCenter };
         });
-        window.addEventListener("mouseleave", () => { target = null; });
+        window.addEventListener("pointerleave", () => { target = null; });
         paint();
         sprite("idle");
         requestAnimationFrame(loop);
@@ -2596,6 +2564,15 @@
         seasonLayer.innerHTML =
           '<div class="frostz-harvest-lights" aria-hidden="true"></div><div class="frostz-harvest-leaves"></div><div class="frostz-harvest-hunt" role="status" aria-live="polite"></div>';
         document.body.appendChild(seasonLayer);
+        const homeScreen = document.getElementById("home-screen");
+        function syncHarvestVisibility() {
+          seasonLayer.hidden = homeScreen.hidden;
+        }
+        syncHarvestVisibility();
+        new MutationObserver(syncHarvestVisibility).observe(homeScreen, {
+          attributes: true,
+          attributeFilter: ["hidden"],
+        });
 
         const lights = seasonLayer.querySelector(".frostz-harvest-lights");
         const hunt = seasonLayer.querySelector(".frostz-harvest-hunt");
@@ -2903,6 +2880,15 @@
             </svg>
           </button>`;
         document.body.appendChild(corner);
+        const homeScreen = document.getElementById("home-screen");
+        function syncTurkeyVisibility() {
+          corner.hidden = homeScreen.hidden;
+        }
+        syncTurkeyVisibility();
+        new MutationObserver(syncTurkeyVisibility).observe(homeScreen, {
+          attributes: true,
+          attributeFilter: ["hidden"],
+        });
 
         const turkey = corner.querySelector(".frostz-turkey");
         const speech = corner.querySelector(".frostz-turkey-speech");

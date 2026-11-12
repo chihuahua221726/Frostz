@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SVG_MAX_BYTES = 20_000_000
 
 
 class LocalGameCards(HTMLParser):
@@ -67,11 +68,21 @@ def build_interactive_svg(page):
   ]]></script>
 </svg>
 """.replace("__FROSTZ_COMPRESSED_APP__", encoded_page)
+    svg_bytes = svg.encode("utf-8")
+    if len(svg_bytes) >= SVG_MAX_BYTES:
+        raise ValueError(
+            f"FrostZ.svg would be {len(svg_bytes):,} bytes; "
+            f"the maximum is {SVG_MAX_BYTES - 1:,} bytes."
+        )
+
     output = ROOT / "FrostZ.svg"
     temporary_output = output.with_suffix(output.suffix + ".tmp")
-    temporary_output.write_text(svg, encoding="utf-8", newline="\n")
+    temporary_output.write_bytes(svg_bytes)
     temporary_output.replace(output)
-    print(f"Built {output.name}: {output.stat().st_size:,} bytes.")
+    print(
+        f"Built {output.name}: {output.stat().st_size:,} bytes "
+        f"({output.stat().st_size / 1_000_000:.2f} MB)."
+    )
 
 
 def build():
