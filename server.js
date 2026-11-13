@@ -8,7 +8,6 @@ import { server as wisp } from "@mercuryworkshop/wisp-js/server";
 const require = createRequire(import.meta.url);
 const dirOf = (specifier) => path.dirname(require.resolve(specifier));
 const app = express();
-const publicDir = path.resolve("public");
 
 app.use((_req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
@@ -16,10 +15,8 @@ app.use((_req, res, next) => {
   next();
 });
 
-app.use(express.static(publicDir));
 app.use("/scram/", express.static(scramjetPath));
 app.use("/utils/", express.static(dirOf("@mercuryworkshop/scramjet-utils")));
-app.use("/controller/", express.static(path.join(publicDir, "scram", "controller")));
 app.use("/controller/", express.static(dirOf("@mercuryworkshop/scramjet-controller")));
 app.use("/libcurl/", express.static(dirOf("@mercuryworkshop/libcurl-transport")));
 app.use("/epoxy/", express.static(dirOf("@mercuryworkshop/epoxy-transport")));
