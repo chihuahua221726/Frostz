@@ -44,6 +44,15 @@ def encode_text(value):
 
 
 def build_interactive_svg(page):
+    browser_assets = {
+        "/scram/scramjet.js": "public/scram/scramjet.js",
+        "/scram/scramjet.wasm": "public/scram/scramjet.wasm",
+        "/controller/controller.api.js": "public/scram/controller/controller.api.js",
+        "/controller/controller.inject.js": "public/scram/controller/controller.inject.js",
+    }
+    for reference, asset_path in browser_assets.items():
+        page = page.replace(reference, data_uri(asset_path))
+
     compressed_page = gzip.compress(page.encode("utf-8"), compresslevel=9, mtime=0)
     encoded_page = base64.b64encode(compressed_page).decode("ascii")
     svg = """<?xml version="1.0" encoding="UTF-8"?>
