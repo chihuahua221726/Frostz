@@ -4,24 +4,15 @@
 import base64
 import gzip
 import html
-import io
 import json
 import mimetypes
 import re
-import stat
-import tarfile
 from html.parser import HTMLParser
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SVG_MAX_BYTES = 20_000_000
-GENERATED_FILES = {
-    "FrostZ.svg",
-    "FrostZ.svg.tmp",
-    "Single.file.html",
-    "Single.file.html.tmp",
-}
 
 
 class LocalGameCards(HTMLParser):
@@ -52,180 +43,31 @@ def encode_text(value):
     return base64.b64encode(value.encode("utf-8")).decode("ascii")
 
 
-def build_repository_archive():
-    archive = io.BytesIO()
-    with tarfile.open(fileobj=archive, mode="w", format=tarfile.USTAR_FORMAT) as tar:
-        for path in sorted(ROOT.rglob("*")):
-            relative_path = path.relative_to(ROOT)
-            if (
-                any(
-                    part in {".git", "__pycache__", "node_modules"}
-                    for part in relative_path.parts
-                )
-                or relative_path.as_posix() in GENERATED_FILES
-                or path.name.endswith((".pyc", ".tmp"))
-                or not path.is_file()
-            ):
-                continue
-
-            data = path.read_bytes()
-            info = tarfile.TarInfo(relative_path.as_posix())
-            info.size = len(data)
-            info.mode = stat.S_IMODE(path.stat().st_mode)
-            info.mtime = 0
-            tar.addfile(info, io.BytesIO(data))
-
-    return gzip.compress(archive.getvalue(), compresslevel=9, mtime=0)
-
-
-def build_interactive_svg(_page):
-    compressed_archive = build_repository_archive()
-    encoded_archive = base64.b64encode(compressed_archive).decode("ascii")
-    mime_types = {}
-    with tarfile.open(
-        fileobj=io.BytesIO(gzip.decompress(compressed_archive)), mode="r:"
-    ) as tar:
-        for member in tar:
-            if member.isfile():
-                extension = Path(member.name).suffix.lower()
-                mime_types[extension] = (
-                    mimetypes.guess_type(member.name)[0] or "application/octet-stream"
-                )
-    encoded_mime_types = json.dumps(mime_types, separators=(",", ":"))
-
+def build_interactive_svg(page):
+    compressed_page = gzip.compress(page.encode("utf-8"), compresslevel=9, mtime=0)
+    encoded_page = base64.b64encode(compressed_page).decode("ascii")
     svg = """<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="100%" height="100%" viewBox="0 0 1280 800" preserveAspectRatio="none" role="application" aria-labelledby="frostz-svg-title frostz-svg-description">
   <title id="frostz-svg-title">FrostZ</title>
-  <desc id="frostz-svg-description">FrostZ repository archive and standalone app, embedded in a compressed SVG.</desc>
-  <metadata id="frostz-compressed-repository">__FROSTZ_COMPRESSED_REPOSITORY__</metadata>
-  <metadata id="frostz-mime-types">__FROSTZ_MIME_TYPES__</metadata>
+  <desc id="frostz-svg-description">Interactive FrostZ site embedded in a scalable SVG.</desc>
+  <metadata id="frostz-compressed-app">__FROSTZ_COMPRESSED_APP__</metadata>
   <foreignObject x="0" y="0" width="1280" height="800">
-    <xhtml:div xmlns="http://www.w3.org/1999/xhtml" id="frostz-loader">
-      <xhtml:div id="frostz-toolbar"><xhtml:strong>FrostZ</xhtml:strong><xhtml:span id="frostz-status">Unpacking the complete FrostZ repository…</xhtml:span><xhtml:a id="frostz-download" download="FrostZ-repository.tar.gz">Download source archive</xhtml:a></xhtml:div>
-      <xhtml:iframe id="frostz-app-frame" title="FrostZ interactive site" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write"></xhtml:iframe>
-    </xhtml:div>
+    <xhtml:iframe id="frostz-app-frame" title="FrostZ interactive site" style="display:block;width:100%;height:100%;border:0" allow="fullscreen; autoplay; gamepad; clipboard-read; clipboard-write"></xhtml:iframe>
   </foreignObject>
-  <style><![CDATA[
-    #frostz-loader { display:flex; flex-direction:column; width:100%; height:100%; background:#061827; color:#eaf8ff; font:14px/1.4 Arial,sans-serif; }
-    #frostz-toolbar { display:flex; flex:0 0 42px; align-items:center; gap:14px; padding:0 14px; background:#0b2233; }
-    #frostz-toolbar strong { font-size:16px; }
-    #frostz-status { flex:1; color:#b6d2e0; }
-    #frostz-download { padding:6px 10px; border:1px solid #53c8f2; border-radius:7px; color:#eaf8ff; text-decoration:none; }
-    #frostz-download:hover,#frostz-download:focus-visible { background:#12334a; outline:2px solid #82ddff; }
-    #frostz-app-frame { width:100%; min-height:0; flex:1; border:0; background:#061827; }
-  ]]></style>
   <script><![CDATA[
     (async () => {
-      const status = document.getElementById("frostz-status");
-      const encoded = document.getElementById("frostz-compressed-repository").textContent.trim();
-      const mimeTypes = JSON.parse(document.getElementById("frostz-mime-types").textContent);
+      const encoded = document.getElementById("frostz-compressed-app").textContent.trim();
       const binary = atob(encoded);
-      const compressed = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-      const decompressed = await new Response(
-        new Blob([compressed]).stream().pipeThrough(new DecompressionStream("gzip"))
-      ).arrayBuffer();
-      const archive = new Uint8Array(decompressed);
-      const decoder = new TextDecoder();
-      const files = new Map();
-      const readString = (start, length) => {
-        const value = decoder.decode(archive.subarray(start, start + length));
-        const nullIndex = value.indexOf(String.fromCharCode(0));
-        return nullIndex < 0 ? value : value.slice(0, nullIndex);
-      };
-      for (let offset = 0; offset + 512 <= archive.length;) {
-        if (archive.subarray(offset, offset + 512).every((byte) => byte === 0)) break;
-        const name = readString(offset, 100);
-        const prefix = readString(offset + 345, 155);
-        const path = prefix ? prefix + "/" + name : name;
-        const size = Number.parseInt(readString(offset + 124, 12).trim(), 8) || 0;
-        const dataStart = offset + 512;
-        if (readString(offset + 156, 1) === "0" || readString(offset + 156, 1) === "") {
-          files.set(path, archive.slice(dataStart, dataStart + size));
-        }
-        offset = dataStart + Math.ceil(size / 512) * 512;
-      }
-      if (!files.has("index.html")) throw new Error("The repository archive has no index.html.");
-
-      const urls = new Map();
-      const textExtensions = new Set([".css", ".htm", ".html", ".js", ".mjs", ".svg"]);
-      for (const [path, bytes] of files) {
-        if (!textExtensions.has(path.slice(path.lastIndexOf(".")).toLowerCase())) {
-          const extension = path.slice(path.lastIndexOf(".")).toLowerCase();
-          urls.set(path, URL.createObjectURL(new Blob([bytes], {
-            type: mimeTypes[extension] || "application/octet-stream",
-          })));
-        }
-      }
-
-      function localUrl(reference, sourcePath) {
-        const value = reference.trim();
-        if (!value || /^(?:[a-z][a-z0-9+.-]*:|\\/\\/|#)/i.test(value)) return null;
-        const split = value.search(/[?#]/);
-        const pathname = split < 0 ? value : value.slice(0, split);
-        const suffix = split < 0 ? "" : value.slice(split);
-        let resolved;
-        try {
-          const base = new URL("https://frostz.invalid/" + sourcePath);
-          resolved = decodeURIComponent(new URL(pathname, value.startsWith("/")
-            ? "https://frostz.invalid/"
-            : base).pathname).replace(/^\\//, "");
-        } catch {
-          return null;
-        }
-        const blobUrl = urls.get(resolved);
-        return blobUrl ? blobUrl + suffix : null;
-      }
-
-      function rewriteText(source, path) {
-        let text = source;
-        text = text.replace(
-          /\\b(src|href|poster|data-src|action|formaction|xlink:href)\\s*=\\s*(["'])(.*?)\\2/gi,
-          (match, attribute, quote, reference) => {
-            const replacement = localUrl(reference, path);
-            return replacement ? attribute + "=" + quote + replacement + quote : match;
-          },
-        );
-        text = text.replace(
-          /url\\(\\s*(["']?)(.*?)\\1\\s*\\)/gi,
-          (match, quote, reference) => {
-            const replacement = localUrl(reference, path);
-            return replacement ? "url(" + quote + replacement + quote + ")" : match;
-          },
-        );
-        if (/\\.(?:html?|js|mjs)$/i.test(path)) {
-          text = text.replace(
-            /(["'`])([^"'`\\s]+)\\1/g,
-            (match, quote, reference) => {
-              const replacement = localUrl(reference, path);
-              return replacement ? quote + replacement + quote : match;
-            },
-          );
-        }
-        return text;
-      }
-
-      for (const [path, bytes] of files) {
-        const extension = path.slice(path.lastIndexOf(".")).toLowerCase();
-        if (!textExtensions.has(extension)) continue;
-        const text = rewriteText(decoder.decode(bytes), path);
-        urls.set(path, URL.createObjectURL(new Blob([text], {
-          type: mimeTypes[extension] || "text/plain;charset=utf-8",
-        })));
-      }
-
-      const download = document.getElementById("frostz-download");
-      download.href = URL.createObjectURL(new Blob([compressed], { type: "application/gzip" }));
-      status.textContent = files.size + " repository files ready.";
-      document.getElementById("frostz-app-frame").src = urls.get("index.html");
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+      const app = await new Response(stream).text();
+      document.getElementById("frostz-app-frame").setAttribute("srcdoc", app);
     })().catch((error) => {
-      document.getElementById("frostz-status").textContent = "Could not load FrostZ: " + error.message;
-      console.error("Could not unpack the FrostZ repository.", error);
+      console.error("Could not load the embedded FrostZ app.", error);
     });
   ]]></script>
 </svg>
-""".replace("__FROSTZ_COMPRESSED_REPOSITORY__", encoded_archive).replace(
-        "__FROSTZ_MIME_TYPES__", encoded_mime_types
-    )
+""".replace("__FROSTZ_COMPRESSED_APP__", encoded_page)
     svg_bytes = svg.encode("utf-8")
     if len(svg_bytes) >= SVG_MAX_BYTES:
         raise ValueError(
