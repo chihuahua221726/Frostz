@@ -1,0 +1,11 @@
+{
+  "name": "frostz-wisp",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@mercuryworkshop/wisp-js": "^0.5.3"
+  }
+}
